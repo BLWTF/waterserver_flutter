@@ -1,0 +1,37 @@
+name: waterserver
+description: A new Flutter project.
+
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.17.1 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  fluent_ui: ^3.10.0
+  system_theme: ^2.0.0
+  window_manager: ^0.2.1
+  flutter_acrylic: ^1.0.0+2
+  url_strategy: ^0.2.0
+  url_launcher: ^6.0.20
+  clipboard: ^0.1.3
+  email_validator: ^2.0.1
+  dio: ^4.0.6
+  path_provider: ^2.0.11
+  http: ^0.13.4
+  bloc: ^8.0.3
+  flutter_bloc: ^8.0.1
+  equatable: ^2.0.3
+  adaptive_scrollbar: ^2.1.2
+  rxdart: ^0.27.4
+  shared_preferences: ^2.0.15
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true

@@ -1,0 +1,8 @@
+{
+    "name": "WaterServer",
+    "version": 0.5,
+    "description": [
+        "Updated contract table"
+    ],
+    "windows_file_name": "installers/windows/Waterserver.exe"
+}
