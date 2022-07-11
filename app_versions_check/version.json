@@ -1,8 +1,8 @@
 {
     "name": "WaterServer",
-    "version": 0.5,
+    "version": 0.1,
     "description": [
-        "Updated contract table"
+        "Base files, boilerplate and app update"
     ],
     "windows_file_name": "installers/windows/Waterserver.exe"
 }
