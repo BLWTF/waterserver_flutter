@@ -8,41 +8,13 @@ abstract class AppEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class AppNavigationChanged extends AppEvent {
-  final AppPage page;
+class AppChangedMysqlSettings extends AppEvent {
+  final MysqlSettings mysqlSettings;
 
-  const AppNavigationChanged(this.page);
-
-  @override
-  List<Object?> get props => [page];
-}
-
-class AppLoaded extends AppEvent {
-  final String message;
-
-  const AppLoaded(this.message);
+  const AppChangedMysqlSettings(this.mysqlSettings);
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [mysqlSettings];
 }
 
-class AppLoadedWithProgress extends AppEvent {
-  final String message;
-  final double progress;
-
-  const AppLoadedWithProgress({required this.message, required this.progress});
-
-  @override
-  List<Object?> get props => [message, progress];
-}
-
-class AppReturnedToNormal extends AppEvent {}
-
-class AppEncounteredError extends AppEvent {
-  final String message;
-
-  const AppEncounteredError(this.message);
-
-  @override
-  List<Object?> get props => [message];
-}
+class AppClearedMessages extends AppEvent {}

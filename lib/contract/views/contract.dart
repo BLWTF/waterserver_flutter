@@ -3,7 +3,7 @@ import 'package:fluent_ui/fluent_ui.dart' hide Colors;
 import 'package:flutter/material.dart' hide Icon, IconButton, Scrollbar;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:waterserver/app/bloc/app_bloc.dart';
-import 'package:waterserver/widgets/window.dart';
+import 'package:waterserver/widgets/window_buttons.dart';
 import 'package:window_manager/window_manager.dart';
 
 class ContractManagement extends StatefulWidget {
@@ -85,13 +85,12 @@ class ContractCreate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTitle = context.read<AppBloc>().state.appTitle;
     return NavigationView(
       appBar: NavigationAppBar(
-        title: DragToMoveArea(
+        title: const DragToMoveArea(
           child: Align(
             alignment: AlignmentDirectional.centerStart,
-            child: Text(appTitle),
+            child: Text(''),
           ),
         ),
         leading: IconButton(

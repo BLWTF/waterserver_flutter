@@ -17,7 +17,7 @@ class SettingsProvider {
 
   Future _setValue(String key, String value) => _plugin.setString(key, value);
 
-  final _mysqlSettingsController = BehaviorSubject<MysqlSettings?>();
+  final _mysqlSettingsController = BehaviorSubject<MysqlSettings>();
 
   void _init() {
     final mysqlSettingsJson = _getValue(mysqlSettingsKey);
@@ -26,15 +26,15 @@ class SettingsProvider {
           MysqlSettings.fromJson(jsonDecode(mysqlSettingsJson));
       _mysqlSettingsController.add(mysqlSettings);
     } else {
-      _mysqlSettingsController.add(null);
+      _mysqlSettingsController.add(MysqlSettings.empty);
     }
   }
 
-  Stream<MysqlSettings?> getMysqlSettings() =>
+  Stream<MysqlSettings> getMysqlSettings() =>
       _mysqlSettingsController.asBroadcastStream();
 
-  Future<void> saveMysqlSettings(MysqlSettings? mysqlSettings) {
+  Future<void> saveMysqlSettings(MysqlSettings mysqlSettings) {
     _mysqlSettingsController.add(mysqlSettings);
-    return _setValue(mysqlSettingsKey, jsonEncode(mysqlSettings?.toJson()));
+    return _setValue(mysqlSettingsKey, jsonEncode(mysqlSettings.toJson()));
   }
 }

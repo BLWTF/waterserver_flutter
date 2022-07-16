@@ -33,15 +33,14 @@ void main() async {
     plugin: await SharedPreferences.getInstance(),
   );
 
+  final settingsRepository =
+      SettingsRepository(settingsProvider: settingsProvider);
+
   BlocOverrides.runZoned(
     () => runApp(
-      MultiRepositoryProvider(
-        providers: [
-          RepositoryProvider.value(
-            value: SettingsRepository(settingsProvider: settingsProvider),
-          ),
-        ],
-        child: const App(title: appTitle),
+      App(
+        title: appTitle,
+        settingsRepository: settingsRepository,
       ),
     ),
     blocObserver: AppObserver(),

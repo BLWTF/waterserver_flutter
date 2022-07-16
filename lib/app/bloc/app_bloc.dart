@@ -1,61 +1,79 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import 'package:waterserver/database/database.dart';
+import 'package:waterserver/settings/settings.dart';
 
 part 'app_event.dart';
 part 'app_state.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
-  AppBloc() : super(const AppState(page: AppPage.dashboard)) {
-    on<AppNavigationChanged>(_onNavigationChanged);
-    on<AppLoaded>(_onLoaded);
-    on<AppLoadedWithProgress>(_onLoadedWithProgress);
-    on<AppReturnedToNormal>(_onReturnedToNormal);
-    on<AppEncounteredError>(_onEAppEncounteredError);
+  final SettingsRepository _settingsRepository;
+  final MysqlDatabaseRepository _databaseRepository;
+  late final StreamSubscription<MysqlSettings> _mysqlSettingsSubscription;
+
+  AppBloc({
+    required SettingsRepository settingsRepository,
+    required MysqlDatabaseRepository databaseRepository,
+  })  : _settingsRepository = settingsRepository,
+        _databaseRepository = databaseRepository,
+        super(const AppState()) {
+    on<AppChangedMysqlSettings>(_onAppChangedMysqlSettings);
+
+    on<AppClearedMessages>((event, emit) =>
+        emit(state.copyWith(message: null, errorMessage: null)));
+
+    _mysqlSettingsSubscription = _settingsRepository.mysqlSettings.listen(
+      (mysqlSettings) {
+        add(AppChangedMysqlSettings(mysqlSettings));
+      },
+    );
   }
 
-  void _onNavigationChanged(
-    AppNavigationChanged event,
+  void _onAppChangedMysqlSettings(
+    AppChangedMysqlSettings event,
     Emitter<AppState> emit,
-  ) {
-    emit(AppState(page: event.page));
+  ) async {
+    if (event.mysqlSettings.isEmpty) {
+      return;
+    }
+
+    emit(state.copyWith(mysqlSettings: event.mysqlSettings));
+
+    try {
+      await _databaseRepository.connect(event.mysqlSettings);
+
+      _showMessage(emit, 'Database connection successful');
+
+      emit(state.copyWith(
+        mysqlStatus: AppMysqlStatus.connected,
+        mysqlSettings: event.mysqlSettings,
+      ));
+
+      final count = await _databaseRepository.count(table: 'customers');
+      print('omo $count');
+    } on CouldNotConnectToDBException catch (e) {
+      _showErrorMessage(emit, e.message!);
+    } catch (e) {
+      print('ayee $e');
+    }
   }
 
-  void _onLoaded(
-    AppLoaded event,
-    Emitter<AppState> emit,
-  ) {
-    emit(state.copyWith(
-      status: AppStatus.loading,
-      message: event.message,
-    ));
+  void _showMessage(Emitter<AppState> emit, String message) {
+    emit(state.copyWith(message: message));
+    emit(state.copyWith(message: null));
   }
 
-  void _onLoadedWithProgress(
-    AppLoadedWithProgress event,
-    Emitter<AppState> emit,
-  ) {
-    emit(state.copyWith(
-      status: AppStatus.progress,
-      message: event.message,
-      progress: event.progress,
-    ));
+  void _showErrorMessage(Emitter<AppState> emit, String message) {
+    emit(state.copyWith(errorMessage: message));
+    emit(state.copyWith(errorMessage: null));
   }
 
-  void _onEAppEncounteredError(
-    AppEncounteredError event,
-    Emitter<AppState> emit,
-  ) {
-    emit(state.copyWith(
-      status: AppStatus.error,
-      message: event.message,
-    ));
-  }
-
-  void _onReturnedToNormal(
-    AppReturnedToNormal event,
-    Emitter<AppState> emit,
-  ) {
-    emit(state.copyWith(status: AppStatus.clear));
+  @override
+  Future<void> close() {
+    _mysqlSettingsSubscription.cancel();
+    return super.close();
   }
 }

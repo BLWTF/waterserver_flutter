@@ -1,37 +1,35 @@
 part of 'app_bloc.dart';
 
-enum AppStatus { clear, loading, progress, success, error }
-
-enum AppPage { dashboard, contract, settings }
+enum AppMysqlStatus { connected, disconnected }
 
 @immutable
 class AppState extends Equatable {
-  final String appTitle = '';
-  final AppStatus? status;
-  final AppPage page;
+  final AppMysqlStatus mysqlStatus;
+  final MysqlSettings mysqlSettings;
   final String? message;
-  final double? progress;
+  final String? errorMessage;
 
   const AppState({
-    required this.page,
-    this.status,
+    this.mysqlStatus = AppMysqlStatus.disconnected,
+    this.mysqlSettings = MysqlSettings.empty,
     this.message,
-    this.progress,
+    this.errorMessage,
   });
 
   AppState copyWith({
-    AppStatus? status,
-    AppPage? page,
+    AppMysqlStatus? mysqlStatus,
+    MysqlSettings? mysqlSettings,
     String? message,
-    double? progress,
+    String? errorMessage,
   }) =>
       AppState(
-        status: status ?? this.status,
-        message: message ?? this.message,
-        page: page ?? this.page,
-        progress: progress ?? this.progress,
+        mysqlStatus: mysqlStatus ?? this.mysqlStatus,
+        mysqlSettings: mysqlSettings ?? this.mysqlSettings,
+        message: message,
+        errorMessage: errorMessage,
       );
 
   @override
-  List<Object?> get props => [status, page, message, progress];
+  List<Object?> get props =>
+      [mysqlStatus, mysqlSettings, message, errorMessage];
 }

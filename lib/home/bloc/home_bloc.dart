@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:waterserver/settings/models/mysql_settings.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
@@ -29,11 +28,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     // on error
     on<HomeStatusError>((event, emit) {
       emit(state.copyWith(status: HomeStatus.error, message: event.message));
+
+      emit(state.copyWith(status: HomeStatus.normal));
     });
 
     // on clear loading or progress dialog
     on<HomeStatusCleared>((event, emit) {
       emit(state.copyWith(status: HomeStatus.clear));
+
+      emit(state.copyWith(status: HomeStatus.normal));
     });
   }
 }

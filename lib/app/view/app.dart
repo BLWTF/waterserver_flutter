@@ -1,18 +1,42 @@
 import 'package:fluent_ui/fluent_ui.dart' hide Page;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:waterserver/app/app.dart';
+import 'package:waterserver/database/database.dart';
 import 'package:waterserver/home/home.dart';
+import 'package:waterserver/settings/settings.dart';
+import 'package:waterserver/utilities/utilities.dart';
 
 class App extends StatelessWidget {
   final String title;
+  final SettingsRepository _settingsRepository;
 
-  const App({Key? key, required this.title}) : super(key: key);
+  const App({
+    Key? key,
+    required this.title,
+    required settingsRepository,
+  })  : _settingsRepository = settingsRepository,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => AppBloc(),
-      child: AppView(title: title),
+    final MysqlDatabaseRepository mysqlDatabaseRepository =
+        MysqlDatabaseRepository(databaseProvider: MysqlUtilService());
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(
+          value: _settingsRepository,
+        ),
+        RepositoryProvider<MysqlDatabaseRepository>.value(
+          value: mysqlDatabaseRepository,
+        )
+      ],
+      child: BlocProvider(
+        create: (_) => AppBloc(
+          settingsRepository: _settingsRepository,
+          databaseRepository: mysqlDatabaseRepository,
+        ),
+        child: AppView(title: title),
+      ),
     );
   }
 }
@@ -27,7 +51,25 @@ class AppView extends StatelessWidget {
     return FluentApp(
       title: title,
       debugShowCheckedModeBanner: false,
-      home: Home(title: title),
+      home: BlocConsumer<AppBloc, AppState>(
+        listener: (context, state) async {
+          if (state.message != null) {
+            showGenericSnackbar(context: context, message: state.message!);
+          }
+
+          if (state.errorMessage != null) {
+            showGenericSnackbar(
+              context: context,
+              message: state.errorMessage!,
+            );
+          }
+        },
+        builder: (context, state) => Home(title: title),
+      ),
     );
+  }
+
+  Function() _onDismissSnackbar(context) {
+    return (context.read<AppBloc>().add(AppClearedMessages()))();
   }
 }

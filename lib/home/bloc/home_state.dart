@@ -1,18 +1,18 @@
 part of 'home_bloc.dart';
 
-enum HomeStatus { clear, loading, progress, success, error }
+enum HomeStatus { normal, clear, loading, progress, success, error }
 
 enum HomePage { dashboard, contract, settings }
 
 class HomeState extends Equatable {
-  final HomeStatus? status;
+  final HomeStatus status;
   final HomePage page;
   final String? message;
   final double? progress;
 
   const HomeState({
     required this.page,
-    this.status,
+    this.status = HomeStatus.normal,
     this.message,
     this.progress,
   });
@@ -24,7 +24,7 @@ class HomeState extends Equatable {
     double? progress,
   }) =>
       HomeState(
-        status: status,
+        status: status ?? this.status,
         message: message ?? this.message,
         page: page ?? this.page,
         progress: progress ?? this.progress,

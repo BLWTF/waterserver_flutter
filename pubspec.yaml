@@ -27,6 +27,8 @@ dependencies:
   adaptive_scrollbar: ^2.1.2
   rxdart: ^0.27.4
   shared_preferences: ^2.0.15
+  formz: ^0.4.1
+  mysql_utils: ^2.0.10
 
 dev_dependencies:
   flutter_test:
