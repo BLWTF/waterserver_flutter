@@ -16,5 +16,3 @@ class AppChangedMysqlSettings extends AppEvent {
   @override
   List<Object?> get props => [mysqlSettings];
 }
-
-class AppClearedMessages extends AppEvent {}

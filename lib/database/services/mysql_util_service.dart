@@ -14,7 +14,6 @@ class MysqlUtilService implements DatabaseProvider {
 
   @override
   Future<void> connect(MysqlSettings settings) async {
-    print(settings.toJson());
     try {
       final db = MysqlUtils(
         settings: settings.toJson(),
@@ -23,7 +22,7 @@ class MysqlUtilService implements DatabaseProvider {
       _db = db;
     } on MySQLServerException catch (e) {
       throw CouldNotConnectToDBException(e.message);
-    } on SocketException catch (e) {
+    } on SocketException catch (_) {
       throw CouldNotConnectToDBException(
           'Can\'t establish connection to database.');
     } catch (e) {
@@ -41,17 +40,17 @@ class MysqlUtilService implements DatabaseProvider {
   Future<int> create({
     required String table,
     required Map<String, dynamic> fields,
-  }) async {
+  }) {
     final createCount = _db!.insert(table: table, insertData: fields);
     return createCount;
   }
 
   @override
-  Future<int> createMany(
-      {required String table,
-      required List<Map<String, dynamic>> fieldsList}) async {
-    final createCount =
-        await _db!.insertAll(table: table, insertData: fieldsList);
+  Future<int> createMany({
+    required String table,
+    required List<Map<String, dynamic>> fieldsList,
+  }) {
+    final createCount = _db!.insertAll(table: table, insertData: fieldsList);
     return createCount;
   }
 
@@ -63,22 +62,39 @@ class MysqlUtilService implements DatabaseProvider {
   }
 
   @override
-  Future<Map<String, dynamic>> find(
-      {required String table, required String id}) async {
-    final row = await _db!.getOne(table: table);
-    return row as Map<String, dynamic>;
+  Future<Map<String, dynamic>> find({
+    required String table,
+    required String id,
+  }) {
+    final row = _db!.getOne(table: table, where: {'id: $id'});
+    return row as Future<Map<String, dynamic>>;
   }
 
   @override
-  Future<int> update(
-      {required String table,
-      required Map<String, dynamic> where,
-      required Map<String, dynamic> fields}) async {
-    final updateCount = await _db!.update(
+  Future<int> update({
+    required String table,
+    required Map<String, dynamic> where,
+    required Map<String, dynamic> fields,
+  }) {
+    final updateCount = _db!.update(
       table: table,
       updateData: fields,
       where: where,
     );
     return updateCount;
+  }
+
+  @override
+  Future<List<dynamic>> get({
+    required String table,
+    required Map<String, dynamic>? where,
+    int? limit,
+  }) {
+    final rows = _db!.getAll(
+      table: table,
+      where: where,
+      limit: limit ?? '',
+    );
+    return rows;
   }
 }

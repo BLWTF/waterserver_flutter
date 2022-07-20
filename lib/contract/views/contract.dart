@@ -1,24 +1,36 @@
 import 'package:adaptive_scrollbar/adaptive_scrollbar.dart';
 import 'package:fluent_ui/fluent_ui.dart' hide Colors;
-import 'package:flutter/material.dart' hide Icon, IconButton, Scrollbar;
+import 'package:flutter/material.dart'
+    hide Icon, IconButton, Scrollbar, ListTile;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:waterserver/app/bloc/app_bloc.dart';
-import 'package:waterserver/widgets/window_buttons.dart';
-import 'package:window_manager/window_manager.dart';
+import 'package:waterserver/contract/contract.dart';
 
-class ContractManagement extends StatefulWidget {
+class ContractManagement extends StatelessWidget {
   const ContractManagement({Key? key}) : super(key: key);
 
   @override
-  State<ContractManagement> createState() => _ContractManagementState();
+  Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: context.read<ContractCubit>(),
+      child: const ContractManagementView(),
+    );
+  }
 }
 
-class _ContractManagementState extends State<ContractManagement> {
+class ContractManagementView extends StatefulWidget {
+  const ContractManagementView({Key? key}) : super(key: key);
+
+  @override
+  State<ContractManagementView> createState() => _ContractManagementViewState();
+}
+
+class _ContractManagementViewState extends State<ContractManagementView> {
   final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AppBloc, AppState>(
+    return BlocConsumer<ContractCubit, ContractState>(
+      listener: (context, state) {},
       builder: (context, state) {
         return ScaffoldPage.scrollable(
           header: PageHeader(
@@ -38,6 +50,35 @@ class _ContractManagementState extends State<ContractManagement> {
             ),
           ),
           children: <Widget>[
+            // Column(
+            //   children: [
+            //     SizedBox(
+            //       height: 200,
+            //       width: 500,
+            //       child: ReorderableListView(
+            //         children: const [
+            //           ListTile(
+            //             key: Key('value1'),
+            //             title: Text('data1'),
+            //           ),
+            //           ListTile(
+            //             key: Key('value2'),
+            //             title: Text('data2'),
+            //           ),
+            //           ListTile(
+            //             key: Key('value3'),
+            //             title: Text('data3'),
+            //           ),
+            //           ListTile(
+            //             key: Key('value4'),
+            //             title: Text('data4'),
+            //           ),
+            //         ],
+            //         onReorder: (i, j) {},
+            //       ),
+            //     ),
+            //   ],
+            // ),
             AdaptiveScrollbar(
               controller: _scrollController,
               position: ScrollbarPosition.bottom,
@@ -47,30 +88,9 @@ class _ContractManagementState extends State<ContractManagement> {
               child: SingleChildScrollView(
                 controller: _scrollController,
                 scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('Contract No.')),
-                    DataColumn(label: Text('Name')),
-                    DataColumn(label: Text('DPC')),
-                    DataColumn(label: Text('Address')),
-                    DataColumn(label: Text('Category')),
-                    DataColumn(label: Text('Tariff')),
-                    DataColumn(label: Text('District')),
-                  ],
-                  rows: const [
-                    DataRow(
-                      cells: [
-                        DataCell(Text('000232')),
-                        DataCell(Text('Ahmad Umar')),
-                        DataCell(Text('01-43-444')),
-                        DataCell(Text('Zaria Local Government')),
-                        DataCell(Text('Commercial')),
-                        DataCell(Text('COM-01')),
-                        DataCell(Text('01')),
-                      ],
-                    )
-                  ],
-                ),
+                child: state.tableData != null
+                    ? ContractTable(tableData: state.tableData!)
+                    : const Text('No data'),
               ),
             ),
           ],
@@ -80,38 +100,26 @@ class _ContractManagementState extends State<ContractManagement> {
   }
 }
 
-class ContractCreate extends StatelessWidget {
-  const ContractCreate({Key? key}) : super(key: key);
+class ContractTable extends StatelessWidget {
+  final ContractTableData tableData;
+
+  const ContractTable({Key? key, required this.tableData}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return NavigationView(
-      appBar: NavigationAppBar(
-        title: const DragToMoveArea(
-          child: Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: Text(''),
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(FluentIcons.back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: Row(
-          children: const [
-            Spacer(),
-            WindowButtons(),
-          ],
-        ),
-      ),
-      content: IconButton(
-        icon: const Icon(FluentIcons.back),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
+    return DataTable(
+      columns: [
+        ...tableData.columnLabels.map((label) => DataColumn(label: Text(label)))
+      ],
+      rows: [
+        ...tableData.rows.map((row) {
+          return DataRow(
+            cells: [
+              ...row.entries.map((row) => DataCell(Text(row.value))),
+            ],
+          );
+        })
+      ],
     );
   }
 }

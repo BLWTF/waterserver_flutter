@@ -22,9 +22,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         super(const AppState()) {
     on<AppChangedMysqlSettings>(_onAppChangedMysqlSettings);
 
-    on<AppClearedMessages>((event, emit) =>
-        emit(state.copyWith(message: null, errorMessage: null)));
-
     _mysqlSettingsSubscription = _settingsRepository.mysqlSettings.listen(
       (mysqlSettings) {
         add(AppChangedMysqlSettings(mysqlSettings));
@@ -51,13 +48,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         mysqlStatus: AppMysqlStatus.connected,
         mysqlSettings: event.mysqlSettings,
       ));
-
-      final count = await _databaseRepository.count(table: 'customers');
-      print('omo $count');
     } on CouldNotConnectToDBException catch (e) {
       _showErrorMessage(emit, e.message!);
-    } catch (e) {
-      print('ayee $e');
     }
   }
 

@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart' hide Page;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:waterserver/app/app.dart';
+import 'package:waterserver/contract/repository/contract_repository.dart';
 import 'package:waterserver/database/database.dart';
 import 'package:waterserver/home/home.dart';
 import 'package:waterserver/settings/settings.dart';
@@ -28,6 +29,11 @@ class App extends StatelessWidget {
         ),
         RepositoryProvider<MysqlDatabaseRepository>.value(
           value: mysqlDatabaseRepository,
+        ),
+        RepositoryProvider<ContractRepository>(
+          create: (_) => ContractRepository(
+            mysqlDatabaseRepository: mysqlDatabaseRepository,
+          ),
         )
       ],
       child: BlocProvider(
@@ -67,9 +73,5 @@ class AppView extends StatelessWidget {
         builder: (context, state) => Home(title: title),
       ),
     );
-  }
-
-  Function() _onDismissSnackbar(context) {
-    return (context.read<AppBloc>().add(AppClearedMessages()))();
   }
 }

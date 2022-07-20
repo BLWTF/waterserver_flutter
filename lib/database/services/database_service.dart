@@ -14,7 +14,7 @@ class DatabaseService implements DatabaseProvider {
       provider.count(table: table, fields: fields);
 
   @override
-  Future create(
+  Future<int> create(
           {required String table, required Map<String, dynamic> fields}) =>
       provider.create(table: table, fields: fields);
 
@@ -46,4 +46,12 @@ class DatabaseService implements DatabaseProvider {
         where: where,
         fields: fields,
       );
+
+  @override
+  Future<List<dynamic>> get({
+    required String table,
+    required Map<String, dynamic>? where,
+    int? limit,
+  }) =>
+      provider.get(table: table, where: where);
 }

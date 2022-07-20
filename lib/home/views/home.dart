@@ -25,6 +25,11 @@ class Home extends StatelessWidget {
             settingsRepository: context.read<SettingsRepository>(),
           ),
         ),
+        BlocProvider(
+          create: (context) => ContractCubit(
+            contractRepository: context.read<ContractRepository>(),
+          ),
+        )
       ],
       child: HomeView(title: title),
     );
@@ -35,6 +40,12 @@ class HomeView extends StatefulWidget {
   final String title;
 
   const HomeView({Key? key, required this.title}) : super(key: key);
+
+  final List<Widget> pages = const [
+    Dashboard(),
+    ContractManagement(),
+    Settings(),
+  ];
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -104,11 +115,7 @@ class _HomeViewState extends State<HomeView> with WindowListener {
           ),
           content: NavigationBody(
             index: index,
-            children: const [
-              Dashboard(),
-              ContractManagement(),
-              Settings(),
-            ],
+            children: [...widget.pages],
           ),
         );
       }),
