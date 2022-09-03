@@ -50,6 +50,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     Emitter<AppState> emit,
   ) async {
     if (event.mysqlSettings.isEmpty) {
+      _showErrorMessage(
+          emit, 'No Mysql connection details provided, go to settings.');
       return;
     }
 

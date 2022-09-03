@@ -12,6 +12,7 @@ import 'package:flutter/material.dart'
         Divider;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:waterserver/app/app.dart';
 import 'package:waterserver/area/area.dart';
 import 'package:waterserver/contract/contract.dart';
 import 'package:waterserver/home/home.dart';
@@ -29,6 +30,16 @@ class ContractManagement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appState = context.watch<AppBloc>().state;
+    if (appState.mysqlStatus == AppMysqlStatus.disconnected) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('No database connection'),
+        ],
+      );
+    }
     return BlocProvider.value(
       value: context.read<ContractCubit>(),
       child: const ContractManagementView(),

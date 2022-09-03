@@ -2,6 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' as mt;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:waterserver/app/app.dart';
 import 'package:waterserver/bill/bill.dart';
 import 'package:waterserver/home/home.dart';
 import 'package:waterserver/print/views/bill_preview.dart';
@@ -19,6 +20,16 @@ class BillManagement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appState = context.watch<AppBloc>().state;
+    if (appState.mysqlStatus == AppMysqlStatus.disconnected) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('No database connection'),
+        ],
+      );
+    }
     return BlocProvider.value(
       value: context.read<BillCubit>(),
       child: const BillManagementView(),

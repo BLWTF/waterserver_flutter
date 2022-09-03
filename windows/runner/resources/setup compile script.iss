@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Waterserver"
-#define MyAppVersion "0.1"
+#define MyAppVersion "0.3"
 #define MyAppPublisher "MUSC Ltd"
 #define MyAppURL "https://www.waterserver.com/"
 #define MyAppExeName "waterserver.exe"
