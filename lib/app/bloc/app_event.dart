@@ -16,3 +16,12 @@ class AppChangedMysqlSettings extends AppEvent {
   @override
   List<Object?> get props => [mysqlSettings];
 }
+
+class AppChangedMysqlStatus extends AppEvent {
+  final AppMysqlStatus mysqlStatus;
+
+  const AppChangedMysqlStatus(this.mysqlStatus);
+
+  @override
+  List<Object?> get props => [mysqlStatus];
+}

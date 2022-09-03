@@ -1,4 +1,4 @@
-import 'package:waterserver/database/database_provider.dart';
+import 'package:waterserver/database/database.dart';
 import 'package:waterserver/settings/models/mysql_settings.dart';
 
 class DatabaseService implements DatabaseProvider {
@@ -10,8 +10,16 @@ class DatabaseService implements DatabaseProvider {
   Future<void> connect(MysqlSettings settings) => provider.connect(settings);
 
   @override
-  Future<int> count({required String table, String fields = '*'}) =>
-      provider.count(table: table, fields: fields);
+  Future<int> count({
+    required String table,
+    String fields = '*',
+    Map<String, dynamic>? where,
+  }) =>
+      provider.count(
+        table: table,
+        fields: fields,
+        where: where,
+      );
 
   @override
   Future<int> create(
@@ -31,7 +39,7 @@ class DatabaseService implements DatabaseProvider {
       provider.delete(table: table, where: where);
 
   @override
-  Future<Map<String, dynamic>> find(
+  Future<Map<dynamic, dynamic>> find(
           {required String table, required String id}) =>
       provider.find(table: table, id: id);
 
@@ -51,7 +59,35 @@ class DatabaseService implements DatabaseProvider {
   Future<List<dynamic>> get({
     required String table,
     required Map<String, dynamic>? where,
+    List<String>? fields,
     int? limit,
+    int? offset,
+    String? orderBy,
   }) =>
-      provider.get(table: table, where: where);
+      provider.get(
+        table: table,
+        where: where,
+        limit: limit,
+        offset: offset,
+        orderBy: orderBy,
+      );
+
+  @override
+  Future<void> close() => provider.close();
+
+  @override
+  Future max({
+    required String table,
+    required String field,
+    String? group,
+    Map<String, dynamic>? having,
+    Map<String, dynamic>? where,
+  }) =>
+      provider.max(
+        table: table,
+        field: field,
+        where: where,
+        group: group,
+        having: having,
+      );
 }

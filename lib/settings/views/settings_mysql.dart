@@ -107,6 +107,11 @@ class _SettingsMysqlState extends State<SettingsMysql> {
                 children: [
                   const SizedBox(height: 20),
                   TextFormBox(
+                    header: 'Host:',
+                    headerStyle: FluentTheme.of(context)
+                        .typography
+                        .caption
+                        ?.apply(fontSizeFactor: 1.0),
                     placeholder: 'Host',
                     controller: _hostController,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -115,6 +120,11 @@ class _SettingsMysqlState extends State<SettingsMysql> {
                   ),
                   const SizedBox(height: 15),
                   TextFormBox(
+                    header: 'User:',
+                    headerStyle: FluentTheme.of(context)
+                        .typography
+                        .caption
+                        ?.apply(fontSizeFactor: 1.0),
                     placeholder: 'User',
                     controller: _userController,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -123,6 +133,11 @@ class _SettingsMysqlState extends State<SettingsMysql> {
                   ),
                   const SizedBox(height: 15),
                   TextFormBox(
+                    header: 'Port:',
+                    headerStyle: FluentTheme.of(context)
+                        .typography
+                        .caption
+                        ?.apply(fontSizeFactor: 1.0),
                     placeholder: 'Port',
                     controller: _portController,
                     keyboardType: TextInputType.number,
@@ -132,6 +147,11 @@ class _SettingsMysqlState extends State<SettingsMysql> {
                   ),
                   const SizedBox(height: 15),
                   TextFormBox(
+                    header: 'Password:',
+                    headerStyle: FluentTheme.of(context)
+                        .typography
+                        .caption
+                        ?.apply(fontSizeFactor: 1.0),
                     placeholder: 'Password',
                     controller: _passwordController,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -143,6 +163,11 @@ class _SettingsMysqlState extends State<SettingsMysql> {
                   ),
                   const SizedBox(height: 15),
                   TextFormBox(
+                    header: 'Database:',
+                    headerStyle: FluentTheme.of(context)
+                        .typography
+                        .caption
+                        ?.apply(fontSizeFactor: 1.0),
                     placeholder: 'Database',
                     controller: _databaseController,
                     autovalidateMode: AutovalidateMode.onUserInteraction,

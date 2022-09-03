@@ -5,7 +5,7 @@ part 'home_event.dart';
 part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  HomeBloc() : super(const HomeState(page: HomePage.dashboard)) {
+  HomeBloc() : super(const HomeState(page: HomePage.bill)) {
     // on navigation pane clicked or page changed
     on<HomePageChanged>((event, emit) {
       emit(state.copyWith(page: event.page));

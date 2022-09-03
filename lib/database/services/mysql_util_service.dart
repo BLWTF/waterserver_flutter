@@ -1,38 +1,105 @@
 import 'dart:io';
 
 import 'package:mysql_utils/mysql_utils.dart';
+import 'package:rxdart/subjects.dart';
+import 'package:waterserver/app/bloc/app_bloc.dart';
 import 'package:waterserver/database/database_provider.dart';
 import 'package:waterserver/database/exceptions.dart';
+import 'package:waterserver/settings/settings.dart' show MysqlSettings;
 // ignore: depend_on_referenced_packages
 import 'package:mysql_client/exception.dart';
-import 'package:waterserver/settings/settings.dart' show MysqlSettings;
 
 class MysqlUtilService implements DatabaseProvider {
   MysqlUtils? _db;
+  MysqlSettings _settings = const MysqlSettings();
 
-  MysqlUtilService();
+  MysqlUtilService() {
+    print('mysql service init');
+  }
+
+  final _mysqlStatusController = BehaviorSubject<AppMysqlStatus>();
+
+  Stream<AppMysqlStatus> get mysqlStatus =>
+      _mysqlStatusController.asBroadcastStream();
+
+  void changeMysqlStatus(AppMysqlStatus status) =>
+      _mysqlStatusController.add(status);
 
   @override
-  Future<void> connect(MysqlSettings settings) async {
+  Future<void> connect([MysqlSettings? settings]) async {
+    if (_db != null) {
+      throw DatabaseAlreadyOpenException();
+    }
+    _settings = settings ?? _settings;
+    if (_settings.isNotEmpty) {
+      try {
+        final db = MysqlUtils(
+          settings: _settings.toJson(),
+        );
+        await db.singleConn;
+        _db = db;
+        _mysqlStatusController.add(AppMysqlStatus.connected);
+      } on MySQLServerException catch (e) {
+        throw CouldNotConnectToDBException(e.message);
+      } on SocketException catch (_) {
+        throw CouldNotConnectToDBException(
+            'Can\'t establish connection to database.');
+      } catch (e) {
+        throw CouldNotConnectToDBException(e.toString());
+      }
+    } else {
+      throw DatabaseSettingsNotProvidedException();
+    }
+  }
+
+  Future<void> _ensureDbIsConnected() async {
     try {
-      final db = MysqlUtils(
-        settings: settings.toJson(),
-      );
-      await db.singleConn;
-      _db = db;
-    } on MySQLServerException catch (e) {
-      throw CouldNotConnectToDBException(e.message);
-    } on SocketException catch (_) {
-      throw CouldNotConnectToDBException(
-          'Can\'t establish connection to database.');
-    } catch (e) {
-      throw CouldNotConnectToDBException(e.toString());
+      await connect();
+    } on DatabaseAlreadyOpenException {
+      // _mysqlStatusController.add(AppMysqlStatus.disconnected);
+    }
+  }
+
+  Future<MysqlUtils> _getDbOrThrow() async {
+    final db = _db;
+    if (db == null) {
+      _mysqlStatusController.add(AppMysqlStatus.disconnected);
+      throw DatabaseIsNotConnectedException();
+    } else {
+      return db;
     }
   }
 
   @override
-  Future<int> count({required String table, String fields = '*'}) async {
-    final count = await _db!.count(table: table, fields: fields);
+  Future<int> count({
+    required String table,
+    String fields = '*',
+    Map<String, dynamic>? where,
+  }) async {
+    await _ensureDbIsConnected();
+    final db = await _getDbOrThrow();
+    final count = db.count(table: table, fields: fields, where: where);
+    return count;
+  }
+
+  Future<int> countOr({
+    required String table,
+    required Map<String, List> where,
+    Map<String, dynamic>? andWhere,
+  }) async {
+    await _ensureDbIsConnected();
+    final db = await _getDbOrThrow();
+    final whereOr = where.sqlify('or');
+    final whereAnd = andWhere != null
+        ? andWhere.entries.fold<String>(
+            '', (prev, el) => '$prev${el.key} = "${el.value}" and ')
+        : '';
+    final whereFinal = '$whereAnd ($whereOr)';
+
+    final count = db.count(
+      table: table,
+      where: whereFinal,
+    );
     return count;
   }
 
@@ -40,8 +107,10 @@ class MysqlUtilService implements DatabaseProvider {
   Future<int> create({
     required String table,
     required Map<String, dynamic> fields,
-  }) {
-    final createCount = _db!.insert(table: table, insertData: fields);
+  }) async {
+    await _ensureDbIsConnected();
+    final db = await _getDbOrThrow();
+    final createCount = db.insert(table: table, insertData: fields);
     return createCount;
   }
 
@@ -49,25 +118,34 @@ class MysqlUtilService implements DatabaseProvider {
   Future<int> createMany({
     required String table,
     required List<Map<String, dynamic>> fieldsList,
-  }) {
-    final createCount = _db!.insertAll(table: table, insertData: fieldsList);
+  }) async {
+    await _ensureDbIsConnected();
+    final db = await _getDbOrThrow();
+    final createCount = db.insertAll(table: table, insertData: fieldsList);
     return createCount;
   }
 
   @override
-  Future<int> delete(
-      {required String table, required Map<String, dynamic> where}) async {
-    final deleteCount = await _db!.delete(table: table, where: where);
+  Future<int> delete({
+    required String table,
+    required Map<String, dynamic> where,
+  }) async {
+    await _ensureDbIsConnected();
+    final db = await _getDbOrThrow();
+    final deleteCount = await db.delete(table: table, where: where);
     return deleteCount;
   }
 
   @override
-  Future<Map<String, dynamic>> find({
+  Future<Map<dynamic, dynamic>> find({
     required String table,
     required String id,
-  }) {
-    final row = _db!.getOne(table: table, where: {'id: $id'});
-    return row as Future<Map<String, dynamic>>;
+    String? altId,
+  }) async {
+    await _ensureDbIsConnected();
+    final db = await _getDbOrThrow();
+    final row = db.getOne(table: table, where: {'${altId ?? "id"}': id});
+    return row;
   }
 
   @override
@@ -75,8 +153,10 @@ class MysqlUtilService implements DatabaseProvider {
     required String table,
     required Map<String, dynamic> where,
     required Map<String, dynamic> fields,
-  }) {
-    final updateCount = _db!.update(
+  }) async {
+    await _ensureDbIsConnected();
+    final db = await _getDbOrThrow();
+    final updateCount = db.update(
       table: table,
       updateData: fields,
       where: where,
@@ -88,13 +168,106 @@ class MysqlUtilService implements DatabaseProvider {
   Future<List<dynamic>> get({
     required String table,
     required Map<String, dynamic>? where,
+    List<String>? fields,
     int? limit,
-  }) {
-    final rows = _db!.getAll(
+    int? offset,
+    String? orderBy,
+  }) async {
+    await _ensureDbIsConnected();
+    final db = await _getDbOrThrow();
+    final fieldsString = fields == null
+        ? '*'
+        : fields.reduce((value, element) => '$value,$element');
+    final limitOffset = offset == null ? '$limit' : '$limit OFFSET $offset';
+    final rows = db.getAll(
       table: table,
+      fields: fieldsString,
       where: where,
-      limit: limit ?? '',
+      limit: limitOffset,
+      order: orderBy,
     );
     return rows;
+  }
+
+  Future<List<dynamic>> getOr({
+    required String table,
+    required Map<String, List> where,
+    Map<String, dynamic>? andWhere,
+    List<String>? fields,
+    int? limit,
+    int? offset,
+    String? orderBy,
+  }) async {
+    await _ensureDbIsConnected();
+    final db = await _getDbOrThrow();
+    final fieldsString = fields == null
+        ? '*'
+        : fields.reduce((value, element) => '$value,$element');
+    final limitOffet = offset == null ? '$limit' : '$limit OFFSET $offset';
+    final whereOr = where.sqlify('or');
+    final whereAnd = andWhere != null
+        ? andWhere.entries.fold<String>(
+            '', (prev, el) => '$prev${el.key} = "${el.value}" and ')
+        : '';
+    final whereFinal = '$whereAnd ($whereOr)';
+    print(whereFinal);
+    final rows = db.getAll(
+      table: table,
+      fields: fieldsString,
+      where: whereFinal,
+      limit: limitOffet,
+      order: orderBy,
+    );
+    return rows;
+  }
+
+  @override
+  Future<void> close() async {
+    final db = _db;
+    if (db == null) {
+      throw DatabaseIsNotConnectedException();
+    } else {
+      await db.close();
+      _db = null;
+    }
+  }
+
+  @override
+  Future max({
+    required String table,
+    required String field,
+    String? group,
+    Map<String, dynamic>? having,
+    Map<String, dynamic>? where,
+  }) async {
+    final db = await _getDbOrThrow();
+    return db.max(
+      table: table,
+      fields: field,
+      where: where,
+      having: having,
+      group: group,
+    );
+  }
+}
+
+extension Sqlify on Map<String, List> {
+  String sqlify(String seperator) {
+    String sql = entries.fold<String>('', (prev, el) {
+      prev = prev.isEmpty ? prev : '$prev $seperator ';
+      return '$prev${el.key} ${el.value.first} "${el.value.elementAt(1)}"';
+    });
+    return sql;
+  }
+}
+
+extension Valuefy on Map<String, List> {
+  Map<String, dynamic> valuefy() {
+    Map<String, dynamic> values =
+        Map.fromEntries(entries.fold<Iterable<MapEntry<String, dynamic>>>(
+      [],
+      (prev, el) => [...prev, MapEntry(el.key, el.value[1])],
+    ));
+    return values;
   }
 }

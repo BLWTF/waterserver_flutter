@@ -1,8 +1,10 @@
 import 'package:waterserver/database/database.dart';
 import 'package:waterserver/settings/models/mysql_settings.dart';
 
+import '../../app/bloc/app_bloc.dart';
+
 class MysqlDatabaseRepository {
-  final DatabaseProvider _databaseProvider;
+  final MysqlUtilService _databaseProvider;
 
   MysqlDatabaseRepository({required databaseProvider})
       : _databaseProvider = databaseProvider;
@@ -11,14 +13,26 @@ class MysqlDatabaseRepository {
     await _databaseProvider.connect(settings);
   }
 
-  Future<int?> count({required String table, String fields = '*'}) =>
-      _databaseProvider.count(table: table, fields: fields);
+  Stream<AppMysqlStatus> get mysqlStatus => _databaseProvider.mysqlStatus;
+
+  Future<int?> count({
+    required String table,
+    String fields = '*',
+    Map<String, dynamic>? where,
+  }) {
+    final count =
+        _databaseProvider.count(table: table, fields: fields, where: where);
+
+    return count;
+  }
 
   Future<int> create({
     required String table,
     required Map<String, dynamic> fields,
-  }) =>
-      _databaseProvider.create(table: table, fields: fields);
+  }) {
+    final createdCount = _databaseProvider.create(table: table, fields: fields);
+    return createdCount;
+  }
 
   Future<int> createMany({
     required String table,
@@ -26,11 +40,12 @@ class MysqlDatabaseRepository {
   }) =>
       _databaseProvider.createMany(table: table, fieldsList: fieldsList);
 
-  Future<Map<String, dynamic>> find({
+  Future<Map<dynamic, dynamic>> find({
     required String table,
     required String id,
+    String? altId,
   }) =>
-      _databaseProvider.find(table: table, id: id);
+      _databaseProvider.find(table: table, id: id, altId: altId);
 
   Future<int> update({
     required String table,
@@ -46,11 +61,90 @@ class MysqlDatabaseRepository {
   Future<List<dynamic>> get({
     required String table,
     Map<String, dynamic>? where,
+    List<String>? fields,
     int? limit,
-  }) =>
-      _databaseProvider.get(
-        table: table,
-        where: where,
-        limit: limit,
-      );
+    int? offset,
+    String? orderBy,
+  }) {
+    final rows = _databaseProvider.get(
+      table: table,
+      where: where,
+      fields: fields,
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy,
+    );
+    return rows;
+  }
+
+  Future<List<dynamic>> search({
+    required String table,
+    required String query,
+    required List<String> fields,
+    Map<String, dynamic>? where,
+    int? limit,
+    int? offset,
+    String? orderBy,
+  }) {
+    final whereMap = fields.toMapForSqlSearch(query);
+    final rows = _databaseProvider.getOr(
+      table: table,
+      where: whereMap,
+      andWhere: where,
+      fields: fields,
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy,
+    );
+    return rows;
+  }
+
+  Future<int> countSearch({
+    required String table,
+    required String query,
+    required List<String> fields,
+    Map<String, dynamic>? where,
+    int? limit,
+    int? offset,
+    String? orderBy,
+  }) {
+    final whereMap = fields.toMapForSqlSearch(query);
+    final count = _databaseProvider.countOr(
+      table: table,
+      where: whereMap,
+      andWhere: where,
+    );
+    return count;
+  }
+
+  Future<double> max({
+    required String table,
+    required String field,
+    String? group,
+    Map<String, dynamic>? having,
+    Map<String, dynamic>? where,
+  }) async {
+    final max = await _databaseProvider.max(
+      table: table,
+      field: field,
+      where: where,
+      group: group,
+      having: having,
+    );
+    return max;
+  }
+}
+
+extension ToMapForSqlSearch on List<String> {
+  Map<String, List> toMapForSqlSearch(String query) {
+    final Map<String, List> map =
+        Map.fromEntries(fold<Iterable<MapEntry<String, List<dynamic>>>>(
+      {},
+      (prev, el) => [
+        ...prev,
+        MapEntry(el, ['like', '%$query%'])
+      ],
+    ));
+    return map;
+  }
 }

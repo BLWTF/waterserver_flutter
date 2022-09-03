@@ -4,6 +4,8 @@ import 'package:fluent_ui/fluent_ui.dart' hide Page;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:waterserver/app/app.dart';
+import 'package:waterserver/area/repository/area_repository.dart';
+import 'package:waterserver/database/database.dart';
 import 'package:waterserver/settings/settings.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -36,11 +38,15 @@ void main() async {
   final settingsRepository =
       SettingsRepository(settingsProvider: settingsProvider);
 
+  final mysqlDatabaseRepository =
+      MysqlDatabaseRepository(databaseProvider: MysqlUtilService());
+
   BlocOverrides.runZoned(
     () => runApp(
       App(
         title: appTitle,
         settingsRepository: settingsRepository,
+        mysqlDatabaseRepository: mysqlDatabaseRepository,
       ),
     ),
     blocObserver: AppObserver(),
@@ -51,6 +57,6 @@ class AppObserver extends BlocObserver {
   @override
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
-    log('${bloc.runtimeType}: $change');
+    log('${bloc.runtimeType}');
   }
 }

@@ -131,9 +131,8 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   Future<void> downloadNewVersion(String appPath) async {
     emit(state.copyWith(
-      status: HomeStatus.progress,
-      message: 'Downloading update',
-      progress: 0,
+      status: HomeStatus.loading,
+      message: 'Downloading update, please wait.',
     ));
 
     final fileName = appPath.split("/").last;
@@ -146,10 +145,10 @@ class SettingsCubit extends Cubit<SettingsState> {
     await dio.download(
       '$gitFolderUri/$appPath',
       downloadedFilePath,
-      onReceiveProgress: (received, total) {
-        final progress = (received / total) * 100;
-        emit(state.copyWith(progress: progress));
-      },
+      // onReceiveProgress: (received, total) {
+      //   final progress = (received / total) * 100;
+      //   emit(state.copyWith(progress: progress));
+      // },
     );
 
     emit(state.copyWith(

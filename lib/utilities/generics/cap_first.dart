@@ -1,5 +1,6 @@
 extension StringExtension on String {
   String capFirst() {
-    return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
+    if (isEmpty) return '';
+    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
   }
 }

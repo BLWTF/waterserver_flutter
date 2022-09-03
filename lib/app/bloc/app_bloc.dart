@@ -13,20 +13,36 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final SettingsRepository _settingsRepository;
   final MysqlDatabaseRepository _databaseRepository;
   late final StreamSubscription<MysqlSettings> _mysqlSettingsSubscription;
+  late final StreamSubscription<AppMysqlStatus> _mysqlStatusSubscription;
 
   AppBloc({
     required SettingsRepository settingsRepository,
     required MysqlDatabaseRepository databaseRepository,
   })  : _settingsRepository = settingsRepository,
         _databaseRepository = databaseRepository,
-        super(const AppState()) {
+        super(const AppState(mysqlStatus: AppMysqlStatus.disconnected)) {
     on<AppChangedMysqlSettings>(_onAppChangedMysqlSettings);
+
+    on<AppChangedMysqlStatus>(_onAppChangedMysqlStatus);
 
     _mysqlSettingsSubscription = _settingsRepository.mysqlSettings.listen(
       (mysqlSettings) {
         add(AppChangedMysqlSettings(mysqlSettings));
       },
     );
+
+    _mysqlStatusSubscription = _databaseRepository.mysqlStatus.listen(
+      (mysqlStatus) {
+        add(AppChangedMysqlStatus(mysqlStatus));
+      },
+    );
+  }
+
+  void _onAppChangedMysqlStatus(
+    AppChangedMysqlStatus event,
+    Emitter<AppState> emit,
+  ) {
+    emit(state.copyWith(mysqlStatus: event.mysqlStatus));
   }
 
   void _onAppChangedMysqlSettings(
@@ -41,15 +57,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     try {
       await _databaseRepository.connect(event.mysqlSettings);
-
       _showMessage(emit, 'Database connection successful');
 
       emit(state.copyWith(
-        mysqlStatus: AppMysqlStatus.connected,
         mysqlSettings: event.mysqlSettings,
       ));
-    } on CouldNotConnectToDBException catch (e) {
-      _showErrorMessage(emit, e.message!);
+    } on DatabaseConnectionException catch (e) {
+      _showErrorMessage(emit, e.message);
     }
   }
 
@@ -66,6 +80,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   @override
   Future<void> close() {
     _mysqlSettingsSubscription.cancel();
+    _mysqlStatusSubscription.cancel();
     return super.close();
   }
 }

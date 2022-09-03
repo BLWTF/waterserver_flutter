@@ -17,10 +17,10 @@ class SettingsRepository {
         return settings;
       });
 
-  MysqlSettings get currentMysqlSettings {
-    return _cache.read<MysqlSettings>(key: settingsCacheKey) ??
-        MysqlSettings.empty;
-  }
+  // MysqlSettings get currentMysqlSettings {
+  //   return _cache.read<MysqlSettings>(key: settingsCacheKey) ??
+  //       MysqlSettings.empty;
+  // }
 
   Future<void> saveMysqlSettings(MysqlSettings mysqlSettings) =>
       _settingsProvider.saveMysqlSettings(mysqlSettings);

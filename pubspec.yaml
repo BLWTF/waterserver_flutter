@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  fluent_ui: ^3.10.0
+  fluent_ui: ^3.12.0
   system_theme: ^2.0.0
   window_manager: ^0.2.1
   flutter_acrylic: ^1.0.0+2
@@ -29,6 +29,10 @@ dependencies:
   shared_preferences: ^2.0.15
   formz: ^0.4.1
   mysql_utils: ^2.0.10
+  data_table_2: ^2.3.5
+  intl: ^0.17.0
+  pdf: ^3.8.3
+  printing: ^5.9.2
 
 dev_dependencies:
   flutter_test:

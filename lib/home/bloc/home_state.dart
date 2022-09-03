@@ -2,7 +2,12 @@ part of 'home_bloc.dart';
 
 enum HomeStatus { normal, clear, loading, progress, success, error }
 
-enum HomePage { dashboard, contract, settings }
+enum HomePage {
+  // dashboard,
+  contract,
+  bill,
+  settings,
+}
 
 class HomeState extends Equatable {
   final HomeStatus status;

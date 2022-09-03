@@ -1,81 +1,53 @@
 part of 'contract_cubit.dart';
 
-class ContractState extends Equatable {
-  final ContractTableData? tableData;
-  final List<String> columns;
+enum ContractManagementPage { main, form, view }
 
-  static const List<String> defaultTableColumns = [
-    'contractNo',
-    'name',
-    'dpc',
-    'connectionAddress',
-    'category',
-    'tariff',
-  ];
+class ContractState extends Equatable {
+  final ContractManagementPage page;
+  final List<String> columns;
+  final String? tableSearchQuery;
+  final ContractFormState? formState;
+  final Contract? selectedContract;
+  final HomeStatus status;
+  final String? message;
 
   const ContractState({
-    this.tableData,
-    this.columns = defaultTableColumns,
+    required this.page,
+    this.columns = Contract.defaultTableColumns,
+    this.tableSearchQuery,
+    this.formState,
+    this.selectedContract,
+    this.status = HomeStatus.normal,
+    this.message,
   });
 
   ContractState copyWith({
-    ContractTableData? tableData,
+    ContractManagementPage? page,
+    List<String>? columns,
+    String? tableSearchQuery,
+    ContractFormState? formState,
+    Contract? selectedContract,
+    HomeStatus? status,
+    String? message,
   }) =>
       ContractState(
-        tableData: tableData ?? this.tableData,
+        page: page ?? this.page,
+        columns: columns ?? this.columns,
+        tableSearchQuery: tableSearchQuery ?? this.tableSearchQuery,
+        formState: formState ?? this.formState,
+        selectedContract: selectedContract ?? this.selectedContract,
+        status: status ?? this.status,
+        message: message ?? this.message,
       );
 
   @override
-  List<Object?> get props => [tableData];
-}
-
-class ContractTableData extends Equatable {
-  final List<String> columns;
-  final List<Contract> contracts;
-  late final List<String> columnLabels;
-  late final List<Map<String, dynamic>> rows;
-
-  static const Map<String, TableColumnMeta> columnsMeta = {
-    'contractNo': TableColumnMeta(label: 'Contract No'),
-    'name': TableColumnMeta(label: 'Name'),
-    'dpc': TableColumnMeta(label: 'DPC'),
-    'connectionAddress': TableColumnMeta(label: 'Address'),
-    'category': TableColumnMeta(label: 'Category'),
-    'tariff': TableColumnMeta(label: 'Tariff'),
-    'district': TableColumnMeta(label: 'District'),
-  };
-
-  ContractTableData({
-    required this.columns,
-    required this.contracts,
-  }) {
-    _parseColumnLabels();
-
-    _parseRows();
-  }
-
-  void _parseColumnLabels() => columnLabels =
-      columns.map((column) => columnsMeta[column]!.label).toList();
-
-  void _parseRows() => rows = contracts.map(
-        (contract) {
-          final contractMap = contract.toMap();
-          final contractMapEntries = columns
-              .map(
-                (column) =>
-                    MapEntry<String, dynamic>(column, contractMap[column]),
-              )
-              .toList();
-          return Map.fromEntries(contractMapEntries);
-        },
-      ).toList();
-
-  @override
-  List<Object?> get props => [columnLabels, columns, rows];
-}
-
-class TableColumnMeta {
-  final String label;
-
-  const TableColumnMeta({required this.label});
+  List<Object?> get props => [
+        page,
+        columns,
+        tableSearchQuery,
+        formState,
+        selectedContract,
+        status,
+        message
+      ];
 }
