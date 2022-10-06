@@ -155,7 +155,6 @@ class _ContractViewState extends State<ContractView> {
                         flex: 4,
                         child: Card(
                           backgroundColor: Colors.white,
-                          elevation: 1,
                           padding: const EdgeInsets.all(20),
                           child: Column(
                             children: [

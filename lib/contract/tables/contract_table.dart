@@ -72,6 +72,8 @@ class _ContractTableState extends State<ContractTable> {
   Widget build(BuildContext context) {
     return Material(
       child: AsyncPaginatedDataTable2(
+        wrapInCard: false,
+        minWidth: 700,
         showFirstLastButtons: true,
         horizontalMargin: 20,
         checkboxHorizontalMargin: 12,

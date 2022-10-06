@@ -4,7 +4,6 @@ import 'package:fluent_ui/fluent_ui.dart' hide Page;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:waterserver/app/app.dart';
-import 'package:waterserver/area/repository/area_repository.dart';
 import 'package:waterserver/database/database.dart';
 import 'package:waterserver/settings/settings.dart';
 import 'package:window_manager/window_manager.dart';

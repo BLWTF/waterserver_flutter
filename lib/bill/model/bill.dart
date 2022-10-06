@@ -100,7 +100,7 @@ class Bill {
     }
   }
 
-  static Map<String, List<String>> casts = {
+  static const Map<String, List<String>> casts = {
     'name': ['lastName', 'firstName', 'middleName'],
     'monthStart': ['billingPeriod', 'billingYear'],
     'monthEnd': ['billingPeriod', 'billingYear'],
@@ -114,6 +114,7 @@ class Bill {
       'lastName': 'surname',
       'firstName': 'firstname',
       'middleName': 'middlename',
+      'fullName': 'fullname',
       'tariff': 'tariff',
       'category': 'category',
       'subcategory': 's_category',

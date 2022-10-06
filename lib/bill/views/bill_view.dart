@@ -117,30 +117,34 @@ class _BillViewState extends State<BillView> {
                           ],
                         ),
                       ),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            WidgetSpan(
-                              child: Icon(
-                                FluentIcons.print,
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(context,
+                                FluentPageRoute(builder: (context) {
+                              return SingleBillPrintPreview(bill: selectedBill);
+                            }));
+                          },
+                          child: RichText(
+                            text: TextSpan(
+                              children: [
+                                WidgetSpan(
+                                  child: Icon(
+                                    FluentIcons.print,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                                const TextSpan(
+                                  text: ' Print Bill',
+                                ),
+                              ],
+                              style: TextStyle(
+                                fontSize: 15,
                                 color: Colors.blue,
+                                fontWeight: FontWeight.normal,
                               ),
                             ),
-                            TextSpan(
-                              text: ' Print Bill',
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  Navigator.push(context,
-                                      FluentPageRoute(builder: (context) {
-                                    return BillPrintPreview(bill: selectedBill);
-                                  }));
-                                },
-                            ),
-                          ],
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: Colors.blue,
-                            fontWeight: FontWeight.normal,
                           ),
                         ),
                       )
@@ -154,7 +158,6 @@ class _BillViewState extends State<BillView> {
                         flex: 4,
                         child: Card(
                           backgroundColor: Colors.white,
-                          elevation: 1,
                           padding: const EdgeInsets.all(20),
                           child: Column(
                             children: [
@@ -281,7 +284,6 @@ class _BillViewState extends State<BillView> {
                             const SizedBox(height: 20),
                             Card(
                               backgroundColor: Colors.white,
-                              elevation: 1,
                               child: Column(
                                 children: [
                                   InfoLabel(

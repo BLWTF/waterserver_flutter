@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:waterserver/cache/cache.dart';
 import 'package:waterserver/database/database.dart';
 
@@ -52,14 +54,18 @@ class AreaRepository {
   }
 
   Future<List<District>> getDistricts() async {
-    if (districtsCache == null) {
-      final rows =
-          await _mysqlDatabaseRepository.get(table: 'district', limit: 100);
-      districtsCache = rows.map((row) => District.fromFPMap(row)).toList();
-      return districtsCache!;
-    }
+    try {
+      if (districtsCache == null) {
+        final rows =
+            await _mysqlDatabaseRepository.get(table: 'district', limit: 100);
+        districtsCache = rows.map((row) => District.fromFPMap(row)).toList();
+        return districtsCache!;
+      }
 
-    return districtsCache!;
+      return districtsCache!;
+    } on TimeoutException catch (_) {
+      return getDistricts();
+    }
   }
 
   Future<List<Zone>> getZones(String district) async {

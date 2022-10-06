@@ -221,6 +221,68 @@ class MysqlUtilService implements DatabaseProvider {
     return rows;
   }
 
+  Future<List<dynamic>> search({
+    required String table,
+    required String query,
+    required List<String> fields,
+    Map<String, dynamic>? where,
+    int? limit,
+    int? offset,
+    String? orderBy,
+  }) async {
+    await _ensureDbIsConnected();
+    final db = await _getDbOrThrow();
+    final fieldsString = fields.reduce((value, element) => '$value,$element');
+    final limitOffet = offset == null ? '$limit' : '$limit OFFSET $offset';
+    final splitQueries = query.split(' ');
+    final whereOrMapList =
+        splitQueries.map((query) => fields.toMapForSqlSearch(query));
+    final whereOrString = whereOrMapList.fold<String>('', (prev, el) {
+      prev = prev.isEmpty ? prev : '$prev and ';
+      return '$prev(${el.sqlify('or')})';
+    });
+    // final whereAnd = andWhere != null
+    //     ? andWhere.entries.fold<String>(
+    //         '', (prev, el) => '$prev${el.key} = "${el.value}" and ')
+    //     : '';
+    // final whereFinal = '$whereAnd ($whereOrString)';
+    final rows = db.getAll(
+      table: table,
+      fields: fieldsString,
+      where: whereOrString,
+      limit: limitOffet,
+      order: orderBy,
+    );
+    return rows;
+  }
+
+  Future<int> countSearch({
+    required String table,
+    required String query,
+    required List<String> fields,
+    Map<String, dynamic>? where,
+  }) async {
+    await _ensureDbIsConnected();
+    final db = await _getDbOrThrow();
+    final splitQueries = query.split(' ');
+    final whereOrMapList =
+        splitQueries.map((query) => fields.toMapForSqlSearch(query));
+    final whereOrString = whereOrMapList.fold<String>('', (prev, el) {
+      prev = prev.isEmpty ? prev : '$prev and ';
+      return '$prev(${el.sqlify('or')})';
+    });
+    // final whereAnd = andWhere != null
+    //     ? andWhere.entries.fold<String>(
+    //         '', (prev, el) => '$prev${el.key} = "${el.value}" and ')
+    //     : '';
+    // final whereFinal = '$whereAnd ($whereOrString)';
+    final count = db.count(
+      table: table,
+      where: whereOrString,
+    );
+    return count;
+  }
+
   @override
   Future<void> close() async {
     final db = _db;
@@ -261,13 +323,16 @@ extension Sqlify on Map<String, List> {
   }
 }
 
-extension Valuefy on Map<String, List> {
-  Map<String, dynamic> valuefy() {
-    Map<String, dynamic> values =
-        Map.fromEntries(entries.fold<Iterable<MapEntry<String, dynamic>>>(
-      [],
-      (prev, el) => [...prev, MapEntry(el.key, el.value[1])],
+extension ToMapForSqlSearch on List<String> {
+  Map<String, List> toMapForSqlSearch(String query) {
+    final Map<String, List> map =
+        Map.fromEntries(fold<Iterable<MapEntry<String, List<dynamic>>>>(
+      {},
+      (prev, el) => [
+        ...prev,
+        MapEntry(el, ['like', '%$query%'])
+      ],
     ));
-    return values;
+    return map;
   }
 }

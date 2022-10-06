@@ -193,11 +193,11 @@ class _ContractManagementFormState extends State<ContractManagementForm> {
                                     .typography
                                     .caption
                                     ?.apply(fontSizeFactor: 1.0),
-                                child: Combobox<String>(
+                                child: ComboBox<String>(
                                   placeholder: const Text('Tariffs'),
                                   value: value,
                                   items: items
-                                      .map((item) => ComboboxItem<String>(
+                                      .map((item) => ComboBoxItem<String>(
                                             value: item,
                                             child: Text(item),
                                           ))
@@ -383,8 +383,11 @@ class _ContractManagementFormState extends State<ContractManagementForm> {
                                   onChanged: (text, reason) => context
                                       .read<ContractCubit>()
                                       .meterSizeUpdated(text),
-                                  items:
-                                      items.map((e) => e.toString()).toList(),
+                                  items: items
+                                      .map((e) => AutoSuggestBoxItem(
+                                          value: e.toString(),
+                                          label: e.toString()))
+                                      .toList(),
                                 ),
                               );
                             },
@@ -416,8 +419,11 @@ class _ContractManagementFormState extends State<ContractManagementForm> {
                                   onChanged: (text, reason) => context
                                       .read<ContractCubit>()
                                       .meterTypeUpdated(text),
-                                  items:
-                                      items.map((e) => e.toString()).toList(),
+                                  items: items
+                                      .map((e) => AutoSuggestBoxItem(
+                                          value: e.toString(),
+                                          label: e.toString()))
+                                      .toList(),
                                 ),
                               );
                             },
@@ -476,14 +482,14 @@ class _ContractManagementFormState extends State<ContractManagementForm> {
                                     .typography
                                     .caption
                                     ?.apply(fontSizeFactor: 1.0),
-                                child: Combobox<String>(
+                                child: ComboBox<String>(
                                   placeholder: const Text('districts'),
                                   value:
                                       items.contains(formState?.district.value)
                                           ? formState?.district.value
                                           : 'none',
                                   items: items
-                                      .map((item) => ComboboxItem<String>(
+                                      .map((item) => ComboBoxItem<String>(
                                             value: item,
                                             child: item == 'none'
                                                 ? Text(item)
@@ -565,11 +571,11 @@ class _ContractManagementFormState extends State<ContractManagementForm> {
                                       ? Colors.red
                                       : null,
                                   padding: const EdgeInsets.all(1),
-                                  child: Combobox<String>(
+                                  child: ComboBox<String>(
                                     placeholder: const Text('zones'),
                                     value: value,
                                     items: items
-                                        .map((item) => ComboboxItem<String>(
+                                        .map((item) => ComboBoxItem<String>(
                                               value: item,
                                               child: item == 'none'
                                                   ? Text(item)
@@ -659,11 +665,11 @@ class _ContractManagementFormState extends State<ContractManagementForm> {
                                       ? Colors.red
                                       : null,
                                   padding: const EdgeInsets.all(1),
-                                  child: Combobox<String>(
+                                  child: ComboBox<String>(
                                     placeholder: const Text('subzones'),
                                     value: value,
                                     items: items
-                                        .map((item) => ComboboxItem<String>(
+                                        .map((item) => ComboBoxItem<String>(
                                               value: item,
                                               child: item == 'none'
                                                   ? Text(item)
@@ -750,11 +756,11 @@ class _ContractManagementFormState extends State<ContractManagementForm> {
                                       ? Colors.red
                                       : null,
                                   padding: const EdgeInsets.all(1),
-                                  child: Combobox<String>(
+                                  child: ComboBox<String>(
                                     placeholder: const Text('rounds'),
                                     value: value,
                                     items: items
-                                        .map((item) => ComboboxItem<String>(
+                                        .map((item) => ComboBoxItem<String>(
                                               value: item,
                                               child: item == 'none'
                                                   ? Text(item)

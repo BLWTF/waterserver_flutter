@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:waterserver/bill/bill.dart';
 import 'package:waterserver/home/home.dart';
 import 'package:waterserver/contract/contract.dart';
-import 'package:waterserver/dashboard/dashboard.dart';
 import 'package:waterserver/settings/settings.dart';
 import 'package:waterserver/utilities/dialog/dialog.dart';
 import 'package:waterserver/widgets/window_buttons.dart';
@@ -49,7 +48,6 @@ class HomeView extends StatefulWidget {
   const HomeView({Key? key, required this.title}) : super(key: key);
 
   final List<Widget> pages = const [
-    // Dashboard(),
     ContractManagement(),
     BillManagement(),
     Settings(),
@@ -160,29 +158,24 @@ class _HomeViewState extends State<HomeView> with WindowListener {
             ),
             indicator: const EndNavigationIndicator(),
             items: <NavigationPaneItem>[
-              // PaneItem(
-              //   icon: const Icon(FluentIcons.home),
-              //   title: const Text('Dashboard'),
-              // ),
               PaneItem(
                 icon: const Icon(FluentIcons.account_management),
+                body: const ContractManagement(),
                 title: const Text('Contract Management'),
               ),
               PaneItem(
                 icon: const Icon(FluentIcons.bill),
+                body: const BillManagement(),
                 title: const Text('Bill Management'),
               ),
             ],
             footerItems: [
               PaneItem(
                 icon: const Icon(FluentIcons.settings),
+                body: const Settings(),
                 title: const Text('Settings'),
               )
             ],
-          ),
-          content: NavigationBody(
-            index: index,
-            children: [...widget.pages],
           ),
         );
       }),

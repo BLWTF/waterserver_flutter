@@ -86,11 +86,10 @@ class MysqlDatabaseRepository {
     int? offset,
     String? orderBy,
   }) {
-    final whereMap = fields.toMapForSqlSearch(query);
-    final rows = _databaseProvider.getOr(
+    final rows = _databaseProvider.search(
       table: table,
-      where: whereMap,
-      andWhere: where,
+      query: query,
+      where: where,
       fields: fields,
       limit: limit,
       offset: offset,
@@ -104,15 +103,12 @@ class MysqlDatabaseRepository {
     required String query,
     required List<String> fields,
     Map<String, dynamic>? where,
-    int? limit,
-    int? offset,
-    String? orderBy,
   }) {
-    final whereMap = fields.toMapForSqlSearch(query);
-    final count = _databaseProvider.countOr(
+    final count = _databaseProvider.countSearch(
       table: table,
-      where: whereMap,
-      andWhere: where,
+      query: query,
+      fields: fields,
+      where: where,
     );
     return count;
   }
@@ -135,16 +131,16 @@ class MysqlDatabaseRepository {
   }
 }
 
-extension ToMapForSqlSearch on List<String> {
-  Map<String, List> toMapForSqlSearch(String query) {
-    final Map<String, List> map =
-        Map.fromEntries(fold<Iterable<MapEntry<String, List<dynamic>>>>(
-      {},
-      (prev, el) => [
-        ...prev,
-        MapEntry(el, ['like', '%$query%'])
-      ],
-    ));
-    return map;
-  }
-}
+// extension ToMapForSqlSearch on List<String> {
+//   Map<String, List> toMapForSqlSearch(String query) {
+//     final Map<String, List> map =
+//         Map.fromEntries(fold<Iterable<MapEntry<String, List<dynamic>>>>(
+//       {},
+//       (prev, el) => [
+//         ...prev,
+//         MapEntry(el, ['like', '%$query%'])
+//       ],
+//     ));
+//     return map;
+//   }
+// }

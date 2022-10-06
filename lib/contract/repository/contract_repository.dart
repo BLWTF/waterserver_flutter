@@ -169,6 +169,7 @@ class ContractRepository {
   }) async {
     final count = await _mysqlDatabaseRepository.countSearch(
         table: table, query: query, fields: fields);
+    print(count);
     return count;
   }
 

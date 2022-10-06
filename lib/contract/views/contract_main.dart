@@ -60,7 +60,6 @@ class _ContractManagementMainState extends State<ContractManagementMain> {
       children: <Widget>[
         SizedBox(
           height: 500,
-          width: 500,
           child: ContractTable(
             contractRepository: context.read<ContractRepository>(),
             columnNames: contractState.columns,

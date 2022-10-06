@@ -75,7 +75,20 @@ class _BillManagementMainState extends State<BillManagementMain> {
                   primaryItems: [
                     CommandBarBuilderItem(
                       builder: (context, mode, w) => Tooltip(
-                        message: "View bill",
+                        message: "Select for printing",
+                        child: w,
+                      ),
+                      wrappedItem: CommandBarButton(
+                        icon: const Icon(FluentIcons.print),
+                        label: const Text('Print'),
+                        onPressed: () => context
+                            .read<BillCubit>()
+                            .pageChanged(BillManagementPage.view),
+                      ),
+                    ),
+                    CommandBarBuilderItem(
+                      builder: (context, mode, w) => Tooltip(
+                        message: "Search & view by contract no.",
                         child: w,
                       ),
                       wrappedItem: CommandBarButton(
@@ -95,7 +108,6 @@ class _BillManagementMainState extends State<BillManagementMain> {
             if (billDate != null) ...[
               SizedBox(
                 height: 500,
-                width: 500,
                 child: BillTable(
                   billRepository: context.read<BillRepository>(),
                   columnNames: billState.columns,
