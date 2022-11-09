@@ -2,7 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:waterserver/utilities/generics/last_day_month.dart';
 
 class MonthPicker extends StatelessWidget {
-  final DateTime selectedDate;
+  final DateTime? selectedDate;
   final Function(DateTime) onSelected;
 
   const MonthPicker({

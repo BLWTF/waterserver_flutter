@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' as mt;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:waterserver/app/app.dart';
+import 'package:waterserver/area/models/models.dart';
 import 'package:waterserver/bill/bill.dart';
 import 'package:waterserver/home/home.dart';
 import 'package:waterserver/print/views/single_bill_preview.dart';
@@ -14,6 +15,7 @@ import 'package:waterserver/widgets/month_picker.dart';
 
 part 'bill_main.dart';
 part 'bill_view.dart';
+part 'bill_print.dart';
 
 class BillManagement extends StatelessWidget {
   const BillManagement({Key? key}) : super(key: key);

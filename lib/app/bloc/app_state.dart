@@ -1,6 +1,6 @@
 part of 'app_bloc.dart';
 
-enum AppMysqlStatus { connected, disconnected }
+enum AppMysqlStatus { connected, disconnected, connecting }
 
 @immutable
 class AppState extends Equatable {
