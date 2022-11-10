@@ -9,12 +9,15 @@ class PaymentManagementForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final formState =
         context.select((PaymentCubit cubit) => cubit.state.formState);
-    if (formState?.billPeriod.value == null ||
-        formState?.dateTime.value == null) {
-      context
-          .read<PaymentCubit>()
-          .datesDefault(context.read<BillCubit>().state.currentBillDate);
+    if (formState != null) {
+      if (formState.billPeriod.value == null ||
+          formState.dateTime.value == null) {
+        context
+            .read<PaymentCubit>()
+            .datesDefault(context.read<BillCubit>().state.currentBillDate);
+      }
     }
+
     return ScaffoldPage.scrollable(
       scrollController: _scrollController,
       header: PageHeader(

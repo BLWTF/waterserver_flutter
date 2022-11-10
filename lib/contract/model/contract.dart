@@ -15,7 +15,9 @@ class Contract {
   final String? subcategory;
   final bool? metered;
   final String? meterNo;
+  final String? meter2No;
   final String? meterSize;
+  final String? meter2Size;
   final String? meterType;
   final int? volume;
   final int? rate;
@@ -36,6 +38,7 @@ class Contract {
 
   late final String name;
   late final Meter? meter;
+  late final Meter? meter2;
   late final Area? area;
 
   Contract({
@@ -50,7 +53,9 @@ class Contract {
     this.subcategory,
     this.metered,
     this.meterNo,
+    this.meter2No,
     this.meterSize,
+    this.meter2Size,
     this.meterType,
     this.agreedVolume,
     this.volume,
@@ -96,6 +101,16 @@ class Contract {
       meter = null;
     }
 
+    if (meter2No != null) {
+      meter = Meter(
+        meterNo: meter2No!,
+        meterSize: meter2Size,
+        meterType: meterType,
+      );
+    } else {
+      meter2 = null;
+    }
+
     if (district != null) {
       area = Area(
         district: district!,
@@ -126,8 +141,11 @@ class Contract {
       'category': 'category',
       'subcategory': 's_category',
       'meterNo': 'meter1_no',
+      'meter2No': 'meter2_no',
       'meterType': 'meter_type',
+      'meter2Type': 'meter2_type',
       'meterSize': 'size1',
+      'meter2Size': 'meter2_size',
       'agreedVolume': 'agreed_volume',
       'volume': 'volume1',
       'limit': 'limit1',
@@ -164,7 +182,9 @@ class Contract {
           round: map[getFPEquivalent('round')],
           folio: map[getFPEquivalent('folio')],
           meterNo: map[getFPEquivalent('meterNo')],
+          meter2No: map[getFPEquivalent('meter2No')],
           meterSize: map[getFPEquivalent('meterSize')],
+          meter2Size: map[getFPEquivalent('meter2Size')],
           meterType: map[getFPEquivalent('meterType')],
           agreedVolume: map[getFPEquivalent('agreedVolume')],
           volume: map[getFPEquivalent('volume')],
@@ -212,8 +232,11 @@ class Contract {
         'volume': volume,
         'rate': rate,
         'meter': meter,
+        'meter2': meter2,
         'meterNo': meterNo,
+        'meter2No': meter2No,
         'meterSize': meterSize,
+        'meter2Size': meter2Size,
         'meterType': meterType,
         'agreedVolume': agreedVolume,
         'initialReadingDate': initialReadingDate,
@@ -226,14 +249,14 @@ class Contract {
         'consumptionType': consumptionType,
       };
 
-  Map<String, dynamic> toFPMap([Map<String, dynamic>? newMap]) {
+  Map<String, dynamic> toFPMap([Map<String, dynamic>? replaceMap]) {
     final map = toMap()..removeWhere((key, value) => casts.containsKey(key));
     final fpMap = Map.fromEntries(map.entries.map((e) {
       final key = e.key;
       late final dynamic value;
 
-      if (newMap != null && newMap.containsKey(key)) {
-        value = newMap[key];
+      if (replaceMap != null && replaceMap.containsKey(key)) {
+        value = replaceMap[key];
       } else {
         switch (key) {
           case 'consumptionType':

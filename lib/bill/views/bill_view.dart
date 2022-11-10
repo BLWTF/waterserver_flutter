@@ -1,20 +1,9 @@
 part of 'bill.dart';
 
-class BillView extends StatefulWidget {
-  const BillView({Key? key}) : super(key: key);
+class BillView extends StatelessWidget {
+  final ScrollController _scrollController = ScrollController();
 
-  @override
-  State<BillView> createState() => _BillViewState();
-}
-
-class _BillViewState extends State<BillView> {
-  late final ScrollController _scrollController;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-  }
+  BillView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,13 +12,7 @@ class _BillViewState extends State<BillView> {
     return ScaffoldPage.scrollable(
       scrollController: _scrollController,
       header: PageHeader(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text('Bill Management'),
-            Text('View'),
-          ],
-        ),
+        title: const Text('Bill View'),
         commandBar: Button(
           child: const Icon(FluentIcons.back),
           onPressed: () {
@@ -121,10 +104,11 @@ class _BillViewState extends State<BillView> {
                         cursor: SystemMouseCursors.click,
                         child: GestureDetector(
                           onTap: () {
-                            Navigator.push(context,
-                                FluentPageRoute(builder: (context) {
-                              return SingleBillPrintPreview(bill: selectedBill);
-                            }));
+                            // Navigator.push(context,
+                            //     FluentPageRoute(builder: (context) {
+                            //   return SingleBillPrintPreview(bill: selectedBill);
+                            // }));
+                            showPrintDialog(context, selectedBill);
                           },
                           child: RichText(
                             text: TextSpan(
@@ -326,4 +310,13 @@ class _BillViewState extends State<BillView> {
       ],
     );
   }
+}
+
+void showPrintDialog(BuildContext context, Bill bill) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return SingleBillPrintPreview(bill: bill);
+    },
+  );
 }

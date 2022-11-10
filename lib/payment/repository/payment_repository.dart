@@ -43,6 +43,12 @@ class PaymentRepository {
     );
   }
 
+  Future<int> deletePayment(String id) async {
+    final deletedId =
+        await _mysqlDatabaseRepository.delete(table: table, where: {'id': id});
+    return deletedId;
+  }
+
   Future<List<Payment>> getPaymentsByContract(
     String contractNo, [
     Map<String, dynamic>? where,

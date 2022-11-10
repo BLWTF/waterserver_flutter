@@ -43,7 +43,7 @@ class MysqlSettings extends Equatable {
         prefix = json['prefix'] ?? '',
         pool = json['pool'] ?? false;
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toMap() => {
         'db': database,
         'port': port,
         'user': user,

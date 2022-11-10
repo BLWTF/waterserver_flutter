@@ -1,20 +1,9 @@
 part of 'bill.dart';
 
-class BillManagementMain extends StatefulWidget {
-  const BillManagementMain({Key? key}) : super(key: key);
+class BillManagementMain extends StatelessWidget {
+  final ScrollController _scrollController = ScrollController();
 
-  @override
-  State<BillManagementMain> createState() => _BillManagementMainState();
-}
-
-class _BillManagementMainState extends State<BillManagementMain> {
-  late final ScrollController _scrollController;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-  }
+  BillManagementMain({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +72,7 @@ class _BillManagementMainState extends State<BillManagementMain> {
                         label: const Text('Print'),
                         onPressed: () => context
                             .read<BillCubit>()
-                            .pageChanged(BillManagementPage.view),
+                            .pageChanged(BillManagementPage.print),
                       ),
                     ),
                     CommandBarBuilderItem(

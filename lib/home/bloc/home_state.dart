@@ -6,6 +6,7 @@ enum HomePage {
   // dashboard,
   contract,
   bill,
+  payment,
   settings,
 }
 

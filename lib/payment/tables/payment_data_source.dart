@@ -2,6 +2,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:waterserver/database/database.dart';
 import 'package:waterserver/payment/payment.dart';
+import 'package:waterserver/utilities/generics/number_format.dart';
 
 class PaymentDataSourceAsync extends AsyncDataTableSource {
   final PaymentRepository _paymentRepository;
@@ -81,16 +82,27 @@ class PaymentDataSourceAsync extends AsyncDataTableSource {
             if (el.key == 'id') {
               return prev;
             }
+            late final DataCell cell;
+            switch (el.key) {
+              case 'contractNo':
+                cell = DataCell(
+                  Text(el.value?.toString() ?? '-'),
+                  onTap: () => onClickCell(row['id']),
+                );
+                break;
+              case 'amount':
+                cell = DataCell(
+                  Text('₦${double.parse(el.value.toString()).format()}'),
+                );
+                break;
+              default:
+                cell = DataCell(
+                  Text(el.value?.toString() ?? ''),
+                );
+            }
             return [
               ...prev,
-              DataCell(
-                Text(el.value?.toString() ?? '-'),
-                onTap: el.key == 'contractNo'
-                    ? () {
-                        onClickCell(row['id']);
-                      }
-                    : null,
-              )
+              cell,
             ];
           })
         ]);

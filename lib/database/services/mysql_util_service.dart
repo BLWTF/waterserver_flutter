@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:mysql_utils/mysql_utils.dart';
@@ -13,9 +14,7 @@ class MysqlUtilService implements DatabaseProvider {
   MysqlUtils? _db;
   MysqlSettings _settings = const MysqlSettings();
 
-  MysqlUtilService() {
-    print('mysql service init');
-  }
+  MysqlUtilService();
 
   final _mysqlStatusController = BehaviorSubject<AppMysqlStatus>();
 
@@ -32,11 +31,24 @@ class MysqlUtilService implements DatabaseProvider {
     }
     _settings = settings ?? _settings;
     if (_settings.isNotEmpty) {
+      final settingsMap = {
+        ..._settings.toMap(),
+        'secure': true,
+        'pool': false,
+      };
       try {
         final db = MysqlUtils(
-          settings: _settings.toJson(),
-        );
-        await db.singleConn;
+            settings: settingsMap,
+            errorLog: (error) {
+              log(error);
+            });
+
+        if (settings?.pool != true) {
+          await db.singleConn;
+        } else {
+          await db.poolConn;
+        }
+
         _db = db;
         _mysqlStatusController.add(AppMysqlStatus.connected);
       } on MySQLServerException catch (e) {

@@ -35,6 +35,6 @@ class SettingsProvider {
 
   Future<void> saveMysqlSettings(MysqlSettings mysqlSettings) {
     _mysqlSettingsController.add(mysqlSettings);
-    return _setValue(mysqlSettingsKey, jsonEncode(mysqlSettings.toJson()));
+    return _setValue(mysqlSettingsKey, jsonEncode(mysqlSettings.toMap()));
   }
 }

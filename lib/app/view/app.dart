@@ -6,6 +6,8 @@ import 'package:waterserver/contract/contract.dart';
 import 'package:waterserver/database/database.dart';
 import 'package:waterserver/area/area.dart';
 import 'package:waterserver/home/home.dart';
+import 'package:waterserver/meter_reading/repository/meter_reading_repository.dart';
+import 'package:waterserver/payment/payment.dart';
 import 'package:waterserver/settings/settings.dart';
 import 'package:waterserver/tariff/tariff.dart';
 import 'package:waterserver/utilities/utilities.dart';
@@ -44,24 +46,51 @@ class App extends StatelessWidget {
             mysqlDatabaseRepository: _mysqlDatabaseRepository,
           ),
         ),
-        RepositoryProvider<ContractRepository>(
-          create: (_) => ContractRepository(
-            mysqlDatabaseRepository: _mysqlDatabaseRepository,
-          ),
-        ),
-        RepositoryProvider<BillRepository>(
-          create: (_) => BillRepository(
-            mysqlDatabaseRepository: _mysqlDatabaseRepository,
-          ),
-        ),
       ],
-      child: BlocProvider(
-        create: (_) => AppBloc(
-          settingsRepository: _settingsRepository,
-          databaseRepository: _mysqlDatabaseRepository,
-        ),
-        child: AppView(title: title),
-      ),
+      child: Builder(builder: (context) {
+        return MultiRepositoryProvider(
+          providers: [
+            RepositoryProvider<ContractRepository>(
+              create: (_) => ContractRepository(
+                mysqlDatabaseRepository: _mysqlDatabaseRepository,
+                areaRepository: RepositoryProvider.of<AreaRepository>(context),
+                tariffRepository:
+                    RepositoryProvider.of<TariffRepository>(context),
+              ),
+            ),
+            RepositoryProvider<BillRepository>(
+              create: (_) => BillRepository(
+                mysqlDatabaseRepository: _mysqlDatabaseRepository,
+                areaRepository: RepositoryProvider.of<AreaRepository>(context),
+                tariffRepository:
+                    RepositoryProvider.of<TariffRepository>(context),
+              ),
+            ),
+            RepositoryProvider<PaymentRepository>(
+              create: (_) => PaymentRepository(
+                mysqlDatabaseRepository: _mysqlDatabaseRepository,
+                areaRepository: RepositoryProvider.of<AreaRepository>(context),
+                tariffRepository:
+                    RepositoryProvider.of<TariffRepository>(context),
+              ),
+            ),
+            RepositoryProvider<MeterReadingRepository>(
+              create: (_) => MeterReadingRepository(
+                mysqlDatabaseRepository: _mysqlDatabaseRepository,
+                tariffRepository:
+                    RepositoryProvider.of<TariffRepository>(context),
+              ),
+            ),
+          ],
+          child: BlocProvider(
+            create: (_) => AppBloc(
+              settingsRepository: _settingsRepository,
+              databaseRepository: _mysqlDatabaseRepository,
+            ),
+            child: AppView(title: title),
+          ),
+        );
+      }),
     );
   }
 }

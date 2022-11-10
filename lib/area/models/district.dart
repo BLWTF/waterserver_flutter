@@ -1,3 +1,5 @@
+import '../area.dart';
+
 class District {
   final String code;
   final String description;
@@ -9,6 +11,8 @@ class District {
           code: map['district']!.toString().trim(),
           description: map['description']!.toString().trim(),
         );
+
+  Area toArea() => Area(district: code, description: description);
 
   @override
   String toString() {

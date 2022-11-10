@@ -1,9 +1,13 @@
+import 'package:waterserver/area/area.dart';
 import 'package:waterserver/cache/cache.dart';
 import 'package:waterserver/contract/contract.dart';
 import 'package:waterserver/database/database.dart';
+import 'package:waterserver/tariff/repository/tariff_repository.dart';
 
 class ContractRepository {
   final MysqlDatabaseRepository _mysqlDatabaseRepository;
+  final AreaRepository _areaRepository;
+  final TariffRepository _tariffRepository;
   final CacheClient _cache;
   static const contractsCountCacheKey = '__contract_count_cache_key';
 
@@ -11,9 +15,13 @@ class ContractRepository {
 
   ContractRepository({
     required MysqlDatabaseRepository mysqlDatabaseRepository,
+    required AreaRepository areaRepository,
+    required TariffRepository tariffRepository,
     CacheClient? cache,
   })  : _cache = cache ?? CacheClient(),
-        _mysqlDatabaseRepository = mysqlDatabaseRepository;
+        _mysqlDatabaseRepository = mysqlDatabaseRepository,
+        _areaRepository = areaRepository,
+        _tariffRepository = tariffRepository;
 
   int? get countCache {
     return _cache.read<int>(key: contractsCountCacheKey);
@@ -27,17 +35,10 @@ class ContractRepository {
 
   Future<Contract> createContract(Contract contract) async {
     final newContractNo = await getNewContractNo();
-    final newFolio = await getNewFolio(
-      district: contract.district!,
-      zone: contract.zone!,
-      subzone: contract.subzone!,
-      round: contract.round!,
-    );
     final contractMap = contract.toFPMap({
       'contractNo': newContractNo,
       'dpc':
-          '${contract.district!}-${contract.zone!}-${contract.subzone!}-${contract.round!}-$newFolio',
-      'folio': newFolio,
+          '${contract.district!}-${contract.zone!}-${contract.subzone!}-${contract.round!}-${contract.folio!}',
     });
     await _mysqlDatabaseRepository.create(table: table, fields: contractMap);
     final newContract = await getContract(contractNo: newContractNo);
@@ -72,11 +73,12 @@ class ContractRepository {
   }
 
   Future<int> getNewFolio({
-    required String district,
-    required String zone,
-    required String subzone,
     required String round,
   }) async {
+    final district = round.getAreaCode(AreaType.district);
+    final zone = round.getAreaCode(AreaType.zone);
+    final subzone = round.getAreaCode(AreaType.subzone);
+    final roundCode = round.getAreaCode(AreaType.round);
     final lastFolio = await _mysqlDatabaseRepository.get(
       table: table,
       fields: ['max(folio) as _max'],
@@ -84,7 +86,7 @@ class ContractRepository {
         'district': district,
         'zone': zone,
         'subzone': subzone,
-        'rounds': round,
+        'rounds': roundCode,
       },
       limit: 1,
     );
@@ -125,8 +127,8 @@ class ContractRepository {
       orderBy: orderBy ?? 'id',
     );
 
-    final List<Contract> contracts = contractsMap.map((contractJson) {
-      return Contract.fromFPMap(contractJson);
+    final List<Contract> contracts = contractsMap.map((contractMap) {
+      return Contract.fromFPMap(contractMap);
     }).toList();
 
     return contracts;
@@ -169,7 +171,6 @@ class ContractRepository {
   }) async {
     final count = await _mysqlDatabaseRepository.countSearch(
         table: table, query: query, fields: fields);
-    print(count);
     return count;
   }
 

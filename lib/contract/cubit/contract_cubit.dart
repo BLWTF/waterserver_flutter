@@ -5,6 +5,7 @@ import 'package:waterserver/contract/contract.dart';
 import 'package:waterserver/database/database.dart';
 import 'package:waterserver/home/home.dart';
 import 'package:waterserver/tariff/model/tariff.dart';
+import 'package:waterserver/utilities/forms.dart';
 
 part 'contract_state.dart';
 
@@ -17,15 +18,7 @@ class ContractCubit extends Cubit<ContractState> {
     required BillRepository billRepository,
   })  : _contractRepository = contractRepository,
         _billRepository = billRepository,
-        super(const ContractState(page: ContractManagementPage.main)) {
-    // initDataTable();
-  }
-
-  void initDataTable() async {
-    try {
-      final contracts = await _contractRepository.getContracts(limit: 20);
-    } on DatabaseIsNotConnectedException catch (_) {}
-  }
+        super(const ContractState(page: ContractManagementPage.main));
 
   void pageChanged(ContractManagementPage page) {
     emit(state.copyWith(page: page));
@@ -154,11 +147,24 @@ class ContractCubit extends Cubit<ContractState> {
     emit(state.copyWith(formState: newFormState));
   }
 
-  void roundUpdated(String value) {
-    final round = ComboField.dirty(value);
+  Future<void> roundUpdated(String roundCode) async {
+    final round = ComboField.dirty(roundCode);
+    final newFolio = await _contractRepository.getNewFolio(
+      round: roundCode,
+    );
+    final folio = Name.dirty(newFolio.toString());
     final newFormState = state.formState == null
-        ? ContractFormState(round: round)
-        : state.formState!.copyWith(round: round);
+        ? ContractFormState(round: round, folio: folio)
+        : state.formState!.copyWith(round: round, folio: folio);
+
+    emit(state.copyWith(formState: newFormState));
+  }
+
+  void folioUpdated(String value) {
+    final folio = Name.dirty(value);
+    final newFormState = state.formState == null
+        ? ContractFormState(folio: folio)
+        : state.formState!.copyWith(folio: folio);
 
     emit(state.copyWith(formState: newFormState));
   }
@@ -215,6 +221,7 @@ class ContractCubit extends Cubit<ContractState> {
     await Future.delayed(const Duration(seconds: 1));
     await _billRepository.createBill(newContract);
     _clearStatus();
+    emit(state.copyWith(formState: const ContractFormState()));
     viewContract(newContract);
   }
 
@@ -228,6 +235,7 @@ class ContractCubit extends Cubit<ContractState> {
     final Contract contract = formState.toModel();
     await _contractRepository.updateContract(contract);
     _clearStatus();
+    emit(state.copyWith(formState: const ContractFormState()));
     viewContract(contract);
   }
 

@@ -20,7 +20,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required MysqlDatabaseRepository databaseRepository,
   })  : _settingsRepository = settingsRepository,
         _databaseRepository = databaseRepository,
-        super(const AppState(mysqlStatus: AppMysqlStatus.disconnected)) {
+        super(const AppState(mysqlStatus: AppMysqlStatus.connecting)) {
     on<AppChangedMysqlSettings>(_onAppChangedMysqlSettings);
 
     on<AppChangedMysqlStatus>(_onAppChangedMysqlStatus);

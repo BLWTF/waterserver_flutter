@@ -3,6 +3,7 @@ import 'package:formz/formz.dart';
 import 'package:waterserver/area/area.dart';
 import 'package:waterserver/contract/contract.dart';
 import 'package:waterserver/tariff/tariff.dart';
+import 'package:waterserver/utilities/forms.dart';
 
 class ContractFormState extends Equatable with FormzMixin {
   final Name id;
@@ -30,6 +31,7 @@ class ContractFormState extends Equatable with FormzMixin {
   final ComboField zone;
   final ComboField subzone;
   final ComboField round;
+  final Name folio;
 
   const ContractFormState({
     this.id = const Name.pure(),
@@ -57,6 +59,7 @@ class ContractFormState extends Equatable with FormzMixin {
     this.zone = const ComboField.pure(),
     this.subzone = const ComboField.pure(),
     this.round = const ComboField.pure(),
+    this.folio = const Name.pure(),
   });
 
   ContractFormState.fromModel(Contract contract)
@@ -88,6 +91,7 @@ class ContractFormState extends Equatable with FormzMixin {
               '${contract.district!}-${contract.zone!}-${contract.subzone!}'),
           round: ComboField.dirty(
               '${contract.district!}-${contract.zone!}-${contract.subzone!}-${contract.round!}'),
+          folio: Name.dirty(contract.folio),
         );
 
   ContractFormState copyWith({
@@ -116,6 +120,7 @@ class ContractFormState extends Equatable with FormzMixin {
     ComboField? zone,
     ComboField? subzone,
     ComboField? round,
+    Name? folio,
   }) =>
       ContractFormState(
         id: id ?? this.id,
@@ -143,6 +148,7 @@ class ContractFormState extends Equatable with FormzMixin {
         zone: zone ?? this.zone,
         subzone: subzone ?? this.subzone,
         round: round ?? this.round,
+        folio: folio ?? this.folio,
       );
 
   Contract toModel() => Contract(
@@ -173,6 +179,7 @@ class ContractFormState extends Equatable with FormzMixin {
         zone: zone.value.getAreaCode(AreaType.zone),
         subzone: subzone.value.getAreaCode(AreaType.subzone),
         round: round.value.getAreaCode(AreaType.round),
+        folio: folio.value,
       );
 
   @override
@@ -202,96 +209,9 @@ class ContractFormState extends Equatable with FormzMixin {
         zone,
         subzone,
         round,
+        folio,
       ];
 
   @override
   List<Object?> get props => inputs;
-}
-
-enum NameValidationError { empty, invalid }
-
-class RequiredName extends FormzInput<String, NameValidationError> {
-  const RequiredName.pure([String value = '']) : super.pure(value);
-  const RequiredName.dirty([String value = '']) : super.dirty(value);
-
-  @override
-  NameValidationError? validator(String? value) {
-    return value?.isNotEmpty == true ? null : NameValidationError.empty;
-  }
-}
-
-enum AddressValidationError { empty, invalid }
-
-class Address extends FormzInput<String, AddressValidationError> {
-  const Address.pure([String value = '']) : super.pure(value);
-  const Address.dirty([String value = '']) : super.dirty(value);
-
-  @override
-  AddressValidationError? validator(String? value) {
-    return value?.isNotEmpty == true ? null : AddressValidationError.empty;
-  }
-}
-
-enum PhoneValidationError { empty, invalid }
-
-class Phone extends FormzInput<String, PhoneValidationError> {
-  const Phone.pure([String value = '']) : super.pure(value);
-  const Phone.dirty([String value = '']) : super.dirty(value);
-
-  @override
-  PhoneValidationError? validator(String? value) {
-    return value?.isNotEmpty == true ? null : PhoneValidationError.empty;
-  }
-}
-
-enum EmailValidationError { empty, invalid }
-
-class Email extends FormzInput<String, EmailValidationError> {
-  const Email.pure([String value = '']) : super.pure(value);
-  const Email.dirty([String value = '']) : super.dirty(value);
-
-  @override
-  EmailValidationError? validator(String? value) {
-    return value?.isNotEmpty == true ? null : EmailValidationError.empty;
-  }
-}
-
-class Name extends FormzInput<String?, NameValidationError> {
-  const Name.pure([String? value = '']) : super.pure(value);
-  const Name.dirty([String? value = '']) : super.dirty(value);
-
-  @override
-  NameValidationError? validator(String? value) {}
-}
-
-enum ComboValidationError { empty, invalid }
-
-class ComboField extends FormzInput<String, ComboValidationError> {
-  const ComboField.pure([String value = '']) : super.pure(value);
-  const ComboField.dirty([String value = '']) : super.dirty(value);
-
-  @override
-  ComboValidationError? validator(String? value) {
-    return value != null || value != 'none' ? null : ComboValidationError.empty;
-  }
-}
-
-enum NumberValidationError { empty, invalid }
-
-class Number extends FormzInput<double?, NumberValidationError> {
-  const Number.pure([double? value]) : super.pure(value);
-  const Number.dirty([double? value]) : super.dirty(value);
-
-  @override
-  NumberValidationError? validator(double? value) {}
-}
-
-class RequiredNumber extends FormzInput<double, NumberValidationError> {
-  const RequiredNumber.pure([double value = 0]) : super.pure(value);
-  const RequiredNumber.dirty([double value = 0]) : super.dirty(value);
-
-  @override
-  NumberValidationError? validator(double? value) {
-    return value != 0 ? null : NumberValidationError.empty;
-  }
 }

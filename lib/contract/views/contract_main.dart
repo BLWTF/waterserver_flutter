@@ -1,24 +1,13 @@
 part of 'contract.dart';
 
-class ContractManagementMain extends StatefulWidget {
-  const ContractManagementMain({Key? key}) : super(key: key);
+class ContractManagementMain extends StatelessWidget {
+  final ScrollController _scrollController = ScrollController();
 
-  @override
-  State<ContractManagementMain> createState() => _ContractManagementMainState();
-}
-
-class _ContractManagementMainState extends State<ContractManagementMain> {
-  late final ScrollController _scrollController;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-  }
+  ContractManagementMain({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final contractState = context.read<ContractCubit>().state;
+    final state = context.watch<ContractCubit>().state;
     return ScaffoldPage.scrollable(
       scrollController: _scrollController,
       header: PageHeader(
@@ -62,8 +51,8 @@ class _ContractManagementMainState extends State<ContractManagementMain> {
           height: 500,
           child: ContractTable(
             contractRepository: context.read<ContractRepository>(),
-            columnNames: contractState.columns,
-            searchQuery: contractState.tableSearchQuery,
+            columnNames: state.columns,
+            searchQuery: state.tableSearchQuery,
             onClickContract: (id) =>
                 context.read<ContractCubit>().viewContractFromId(id),
             onSearch: (query) =>

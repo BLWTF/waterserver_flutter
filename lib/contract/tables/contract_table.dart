@@ -12,14 +12,13 @@ class ContractTable extends StatefulWidget {
   final Function(String) onClickContract;
 
   const ContractTable({
-    Key? key,
+    super.key,
     required ContractRepository contractRepository,
     required this.columnNames,
     this.searchQuery,
     required this.onSearch,
     required this.onClickContract,
-  })  : _contractRepository = contractRepository,
-        super(key: key);
+  }) : _contractRepository = contractRepository;
 
   @override
   State<ContractTable> createState() => _ContractTableState();

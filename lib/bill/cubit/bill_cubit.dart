@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:waterserver/area/area.dart';
 import 'package:waterserver/bill/bill.dart';
 import 'package:waterserver/home/home.dart';
 
@@ -74,6 +75,66 @@ class BillCubit extends Cubit<BillState> {
       master: master,
     );
     viewBill(contract);
+  }
+
+  void updatePrintBillDate(DateTime date) {
+    emit(state.copyWith(printBillDate: date));
+  }
+
+  Future<void> updateBillPrintBy(String? printBy, DateTime billDate) async {
+    emit(state.copyWithNullBillPrintBy(printBy));
+
+    if (printBy == null) return;
+
+    late final List<Area> areas;
+    switch (printBy) {
+      case 'district':
+        areas = (await _billRepository.getBillPeriodDistricts(billDate))
+            .map((e) => e.toArea())
+            .toList();
+        break;
+      case 'zone':
+        areas = (await _billRepository.getBillPeriodZones(billDate))
+            .map((e) => e.toArea())
+            .toList();
+        break;
+      case 'subzone':
+        areas = (await _billRepository.getBillPeriodSubzones(billDate))
+            .map((e) => e.toArea())
+            .toList();
+        break;
+      case 'rounds':
+        areas = (await _billRepository.getBillPeriodRounds(billDate))
+            .map((e) => e.toArea())
+            .toList();
+        break;
+    }
+    emit(state.copyWith(printByAreas: areas, selectedPrintByAreas: areas));
+  }
+
+  void selectArea(Area area) {
+    final selectedPrintByAreas = [...state.selectedPrintByAreas, area];
+
+    emit(state.copyWith(selectedPrintByAreas: selectedPrintByAreas));
+  }
+
+  void deselectArea(Area area) {
+    List<Area> selectedPrintByAreas = [...state.selectedPrintByAreas];
+    selectedPrintByAreas.remove(area);
+
+    emit(state.copyWith(selectedPrintByAreas: selectedPrintByAreas));
+  }
+
+  bool isAllAreasSelected() {
+    return state.printByAreas?.length == state.selectedPrintByAreas.length;
+  }
+
+  void selectAllAreas() {
+    emit(state.copyWith(selectedPrintByAreas: [...?state.printByAreas]));
+  }
+
+  void deselectAllAreas() {
+    emit(state.copyWith(selectedPrintByAreas: []));
   }
 
   void _loadStatus([String? message]) {

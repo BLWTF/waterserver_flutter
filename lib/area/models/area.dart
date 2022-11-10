@@ -1,28 +1,35 @@
-class Area {
+import 'package:equatable/equatable.dart';
+
+class Area extends Equatable {
   final String district;
   final String? zone;
   final String? subzone;
   final String? round;
+  final String? description;
 
-  late final String code;
-
-  Area({
+  const Area({
     required this.district,
     this.zone,
     this.subzone,
     this.round,
-  }) {
+    this.description,
+  });
+
+  String get code {
     var newCode = district;
     if (zone != null) newCode += '-$zone';
     if (subzone != null) newCode += '-$subzone';
     if (round != null) newCode += '-$round';
-    code = newCode;
+    return newCode;
   }
 
   @override
   String toString() {
-    return code;
+    return description == null ? code : "$code ($description)";
   }
+
+  @override
+  List<Object?> get props => [district, zone, subzone, round];
 }
 
 enum AreaType { district, zone, subzone, round }

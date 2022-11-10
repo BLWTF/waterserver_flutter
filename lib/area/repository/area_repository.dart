@@ -68,33 +68,54 @@ class AreaRepository {
     }
   }
 
-  Future<List<Zone>> getZones(String district) async {
-    final rows = await _mysqlDatabaseRepository.get(
-        table: 'zone', where: {'district': district}, limit: 100);
-    final zones = rows.map((row) => Zone.fromFPMap(row)).toList();
-    return zonesCache.putIfAbsent(district, () => zones);
+  Future<List<Zone>> getZones(String districtCode) async {
+    if (!zonesCache.containsKey(districtCode)) {
+      final rows = await _mysqlDatabaseRepository.get(
+          table: 'zone', where: {'district': districtCode}, limit: 100);
+      final zones = rows.map((row) => Zone.fromFPMap(row)).toList();
+      final cache = zonesCache;
+      cache.addAll({districtCode: zones});
+      zonesCache = cache;
+      return zones;
+    } else {
+      return zonesCache[districtCode]!;
+    }
   }
 
   Future<List<Subzone>> getSubzones(String zone) async {
-    final district = zone.getAreaCode(AreaType.district);
-    final zoneCode = zone.getAreaCode(AreaType.zone);
-    final rows = await _mysqlDatabaseRepository.get(
-        table: 'subzone',
-        where: {'district': district, 'zone': zoneCode},
-        limit: 100);
-    final subzones = rows.map((row) => Subzone.fromFPMap(row)).toList();
-    return subzonesCache.putIfAbsent(zone, () => subzones);
+    if (!subzonesCache.containsKey(zone)) {
+      final districtCode = zone.getAreaCode(AreaType.district);
+      final zoneCode = zone.getAreaCode(AreaType.zone);
+      final rows = await _mysqlDatabaseRepository.get(
+          table: 'subzone',
+          where: {'district': districtCode, 'zone': zoneCode},
+          limit: 100);
+      final subzones = rows.map((row) => Subzone.fromFPMap(row)).toList();
+      final cache = subzonesCache;
+      cache.addAll({zone: subzones});
+      subzonesCache = cache;
+      return subzones;
+    } else {
+      return subzonesCache[zone]!;
+    }
   }
 
   Future<List<Round>> getRounds(String subzone) async {
-    final district = subzone.getAreaCode(AreaType.district);
-    final zone = subzone.getAreaCode(AreaType.zone);
-    final subzoneCode = subzone.getAreaCode(AreaType.subzone);
-    final rows = await _mysqlDatabaseRepository.get(
-        table: 'rounds',
-        where: {'district': district, 'zone': zone, 'subzone': subzoneCode},
-        limit: 100);
-    final rounds = rows.map((row) => Round.fromFPMap(row)).toList();
-    return roundsCache.putIfAbsent(subzone, () => rounds);
+    if (!roundsCache.containsKey(subzone)) {
+      final district = subzone.getAreaCode(AreaType.district);
+      final zone = subzone.getAreaCode(AreaType.zone);
+      final subzoneCode = subzone.getAreaCode(AreaType.subzone);
+      final rows = await _mysqlDatabaseRepository.get(
+          table: 'rounds',
+          where: {'district': district, 'zone': zone, 'subzone': subzoneCode},
+          limit: 100);
+      final rounds = rows.map((row) => Round.fromFPMap(row)).toList();
+      final cache = roundsCache;
+      cache.addAll({subzone: rounds});
+      roundsCache = cache;
+      return rounds;
+    } else {
+      return roundsCache[subzone]!;
+    }
   }
 }

@@ -48,7 +48,7 @@ class _PaymentTableState extends State<PaymentTable> {
   @override
   void didUpdateWidget(covariant PaymentTable oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // _paymentsDataSource?.refreshDatasource();
+    _paymentsDataSource?.refreshDatasource();
   }
 
   @override

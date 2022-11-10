@@ -1,20 +1,9 @@
 part of 'contract.dart';
 
-class ContractView extends StatefulWidget {
-  const ContractView({Key? key}) : super(key: key);
+class ContractView extends StatelessWidget {
+  final ScrollController _scrollController = ScrollController();
 
-  @override
-  State<ContractView> createState() => _ContractViewState();
-}
-
-class _ContractViewState extends State<ContractView> {
-  late final ScrollController _scrollController;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-  }
+  ContractView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,3 +1,5 @@
+import '../area.dart';
+
 class Subzone {
   final String subzoneCode;
   final String zoneCode;
@@ -22,6 +24,13 @@ class Subzone {
           districtCode: map['district']!.toString().trim(),
           description: map['description']!.toString().trim(),
         );
+
+  Area toArea() => Area(
+        district: districtCode,
+        zone: zoneCode,
+        subzone: subzoneCode,
+        description: description,
+      );
 
   @override
   String toString() {

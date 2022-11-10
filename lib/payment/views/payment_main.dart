@@ -40,7 +40,8 @@ class PaymentManagementMain extends StatelessWidget {
               paymentRepository: context.read<PaymentRepository>(),
               columnNames: state.columns,
               searchQuery: state.tableSearchQuery,
-              onClickPayment: (id) => print('as $id'),
+              onClickPayment: (id) =>
+                  context.read<PaymentCubit>().viewPaymentFromId(id),
               onSearch: (query) =>
                   context.read<PaymentCubit>().tableSearch(query),
             ),

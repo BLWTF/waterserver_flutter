@@ -129,6 +129,13 @@ class MysqlDatabaseRepository {
     );
     return max;
   }
+
+  Future<int> delete({
+    required String table,
+    required Map<String, dynamic> where,
+  }) async {
+    return await _databaseProvider.delete(table: table, where: where);
+  }
 }
 
 // extension ToMapForSqlSearch on List<String> {

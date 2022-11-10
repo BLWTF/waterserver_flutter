@@ -1,9 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart' as mt;
+import 'package:flutter/material.dart' as mt show LinearProgressIndicator;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:waterserver/app/app.dart';
 import 'package:waterserver/area/models/models.dart';
+import 'package:waterserver/area/area.dart';
 import 'package:waterserver/bill/bill.dart';
 import 'package:waterserver/home/home.dart';
 import 'package:waterserver/print/views/single_bill_preview.dart';
@@ -23,12 +23,19 @@ class BillManagement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppBloc>().state;
-    if (appState.mysqlStatus == AppMysqlStatus.disconnected) {
+    if (appState.mysqlStatus != AppMysqlStatus.connected) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('No database connection'),
+          if (appState.mysqlStatus == AppMysqlStatus.disconnected)
+            const Text('No database connection'),
+          if (appState.mysqlStatus == AppMysqlStatus.connecting)
+            const Center(
+                child: SizedBox(
+                    width: 64,
+                    height: 16,
+                    child: mt.LinearProgressIndicator())),
         ],
       );
     }
@@ -69,9 +76,10 @@ class BillManagementView extends StatelessWidget {
       builder: (context, state) {
         return IndexedStack(
           index: state.page.index,
-          children: const [
+          children: [
             BillManagementMain(),
             BillView(),
+            BillPrint(),
           ],
         );
       },

@@ -26,6 +26,14 @@ class PaymentCubit extends Cubit<PaymentState> {
     emit(state.copyWith(page: page));
   }
 
+  void deletePayment(String id) async {
+    _loadStatus('Deleting payment');
+    await _paymentRepository.deletePayment(id);
+    await Future.delayed(const Duration(seconds: 1));
+    _clearStatus();
+    emit(state.copyWith(page: PaymentManagementPage.main));
+  }
+
   void contractNoUpdated(String value) {
     final contractNo = RequiredName.dirty(value);
     final newFormState = state.formState == null

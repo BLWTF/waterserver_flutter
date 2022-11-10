@@ -3,6 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:waterserver/bill/bill.dart';
 import 'package:waterserver/home/home.dart';
 import 'package:waterserver/contract/contract.dart';
+import 'package:waterserver/meter_reading/cubit/meter_reading_cubit.dart';
+import 'package:waterserver/meter_reading/repository/meter_reading_repository.dart';
+import 'package:waterserver/meter_reading/views/meter_reading.dart';
+import 'package:waterserver/payment/payment.dart';
 import 'package:waterserver/settings/settings.dart';
 import 'package:waterserver/utilities/dialog/dialog.dart';
 import 'package:waterserver/widgets/window_buttons.dart';
@@ -34,6 +38,18 @@ class Home extends StatelessWidget {
         BlocProvider(
           create: (context) => BillCubit(
             billRepository: context.read<BillRepository>(),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => PaymentCubit(
+            contractRepository: context.read<ContractRepository>(),
+            paymentRepository: context.read<PaymentRepository>(),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => MeterReadingCubit(
+            contractRepository: context.read<ContractRepository>(),
+            meterReadingRepository: context.read<MeterReadingRepository>(),
           ),
         ),
       ],
@@ -153,20 +169,30 @@ class _HomeViewState extends State<HomeView> with WindowListener {
                 .read<HomeBloc>()
                 .add(HomePageChanged(HomePage.values[i])),
             size: const NavigationPaneSize(
-              openMinWidth: 250.0,
-              openMaxWidth: 320.0,
+              openMinWidth: 150.0,
+              openMaxWidth: 220.0,
             ),
             indicator: const EndNavigationIndicator(),
             items: <NavigationPaneItem>[
               PaneItem(
                 icon: const Icon(FluentIcons.account_management),
                 body: const ContractManagement(),
-                title: const Text('Contract Management'),
+                title: const Text('Contract'),
               ),
               PaneItem(
                 icon: const Icon(FluentIcons.bill),
                 body: const BillManagement(),
-                title: const Text('Bill Management'),
+                title: const Text('Bill'),
+              ),
+              PaneItem(
+                icon: const Icon(FluentIcons.money),
+                body: const PaymentManagement(),
+                title: const Text('Payment'),
+              ),
+              PaneItem(
+                icon: const Icon(FluentIcons.calculated_table),
+                body: const MeterReadingManagement(),
+                title: const Text('Meter Reading'),
               ),
             ],
             footerItems: [

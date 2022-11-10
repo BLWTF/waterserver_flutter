@@ -1,9 +1,8 @@
 {
     "name": "WaterServer",
-    "version": 0.3,
+    "version": 0.4,
     "description": [
-        "Bill table added, connection to database",
-        "Bill printing added"
+        "Added Payment Module"
     ],
     "windows_file_name": "installers/windows/Waterserver.exe"
 }

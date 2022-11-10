@@ -19,6 +19,7 @@ import 'package:waterserver/home/home.dart';
 import 'package:waterserver/tariff/tariff.dart';
 import 'package:waterserver/utilities/generics/cap_first.dart';
 import 'package:waterserver/widgets/custom_row.dart';
+import 'package:waterserver/widgets/custom_text_form_box.dart';
 import 'package:waterserver/widgets/info.dart';
 
 part 'contract_main.dart';
@@ -31,12 +32,17 @@ class ContractManagement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppBloc>().state;
-    if (appState.mysqlStatus == AppMysqlStatus.disconnected) {
+    if (appState.mysqlStatus != AppMysqlStatus.connected) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('No database connection'),
+          if (appState.mysqlStatus == AppMysqlStatus.disconnected)
+            const Text('No database connection'),
+          if (appState.mysqlStatus == AppMysqlStatus.connecting)
+            const Center(
+                child: SizedBox(
+                    width: 64, height: 16, child: LinearProgressIndicator())),
         ],
       );
     }
@@ -77,7 +83,7 @@ class ContractManagementView extends StatelessWidget {
       builder: (context, state) {
         return IndexedStack(
           index: state.page.index,
-          children: const [
+          children: [
             ContractManagementMain(),
             ContractManagementForm(),
             ContractView(),
