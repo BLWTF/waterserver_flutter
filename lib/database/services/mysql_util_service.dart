@@ -33,7 +33,7 @@ class MysqlUtilService implements DatabaseProvider {
     if (_settings.isNotEmpty) {
       final settingsMap = {
         ..._settings.toMap(),
-        'secure': true,
+        'secure': false,
         'pool': false,
       };
       try {

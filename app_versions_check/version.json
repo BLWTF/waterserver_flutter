@@ -1,8 +1,9 @@
 {
     "name": "WaterServer",
-    "version": 0.4,
+    "version": 0.5,
     "description": [
-        "Added Payment Module"
+        "Added Payment Module",
+        "Fixed MySQL secure issue"
     ],
     "windows_file_name": "installers/windows/Waterserver.exe"
 }
