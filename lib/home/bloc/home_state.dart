@@ -7,6 +7,7 @@ enum HomePage {
   contract,
   bill,
   payment,
+  meterReading,
   settings,
 }
 
