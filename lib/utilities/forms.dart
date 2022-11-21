@@ -64,7 +64,7 @@ class ComboField extends FormzInput<String, ComboValidationError> {
   }
 }
 
-enum NumberValidationError { empty, invalid }
+enum NumberValidationError { empty, invalid, limitExceeded }
 
 class Number extends FormzInput<double?, NumberValidationError> {
   const Number.pure([double? value]) : super.pure(value);
@@ -75,11 +75,20 @@ class Number extends FormzInput<double?, NumberValidationError> {
 }
 
 class RequiredNumber extends FormzInput<String?, NumberValidationError> {
-  const RequiredNumber.pure([String? value]) : super.pure(value);
-  const RequiredNumber.dirty([String? value]) : super.dirty(value);
+  final int? limit;
+
+  const RequiredNumber.pure([String? value, this.limit]) : super.pure(value);
+  const RequiredNumber.dirty([String? value, this.limit]) : super.dirty(value);
 
   @override
   NumberValidationError? validator(String? value) {
+    if (limit != null) {
+      return value != null &&
+              int.tryParse(value) != null &&
+              int.tryParse(value)! >= limit! == true
+          ? null
+          : NumberValidationError.limitExceeded;
+    }
     return value != null && int.tryParse(value) != null
         ? null
         : NumberValidationError.empty;

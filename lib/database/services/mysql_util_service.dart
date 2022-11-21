@@ -94,6 +94,17 @@ class MysqlUtilService implements DatabaseProvider {
     return count;
   }
 
+  Future<int> rawCount({
+    required String table,
+    String fields = '*',
+    required String where,
+  }) async {
+    await _ensureDbIsConnected();
+    final db = await _getDbOrThrow();
+    final count = db.count(table: table, fields: fields, where: where);
+    return count;
+  }
+
   Future<int> countOr({
     required String table,
     required Map<String, List> where,
@@ -176,6 +187,32 @@ class MysqlUtilService implements DatabaseProvider {
     return updateCount;
   }
 
+  Future<List<dynamic>> rawGet({
+    required String table,
+    required String where,
+    List<String>? fields,
+    int? limit,
+    int? offset,
+    String? orderBy,
+  }) async {
+    await _ensureDbIsConnected();
+    final db = await _getDbOrThrow();
+    final fieldsString = fields == null
+        ? '*'
+        : fields.reduce((value, element) => '$value,$element');
+    final limitOffset =
+        offset == null ? '${limit ?? ""}' : '$limit OFFSET $offset';
+    print(limitOffset);
+    final rows = await db.getAll(
+      table: table,
+      where: where,
+      fields: fieldsString,
+      limit: limitOffset,
+      order: orderBy,
+    );
+    return rows;
+  }
+
   @override
   Future<List<dynamic>> get({
     required String table,
@@ -190,7 +227,8 @@ class MysqlUtilService implements DatabaseProvider {
     final fieldsString = fields == null
         ? '*'
         : fields.reduce((value, element) => '$value,$element');
-    final limitOffset = offset == null ? '$limit' : '$limit OFFSET $offset';
+    final limitOffset =
+        offset == null ? '${limit ?? ""}' : '$limit OFFSET $offset';
     final rows = db.getAll(
       table: table,
       fields: fieldsString,
@@ -215,14 +253,14 @@ class MysqlUtilService implements DatabaseProvider {
     final fieldsString = fields == null
         ? '*'
         : fields.reduce((value, element) => '$value,$element');
-    final limitOffet = offset == null ? '$limit' : '$limit OFFSET $offset';
+    final limitOffet =
+        offset == null ? '${limit ?? ""}' : '$limit OFFSET $offset';
     final whereOr = where.sqlify('or');
     final whereAnd = andWhere != null
         ? andWhere.entries.fold<String>(
             '', (prev, el) => '$prev${el.key} = "${el.value}" and ')
         : '';
     final whereFinal = '$whereAnd ($whereOr)';
-    print(whereFinal);
     final rows = db.getAll(
       table: table,
       fields: fieldsString,
@@ -245,7 +283,8 @@ class MysqlUtilService implements DatabaseProvider {
     await _ensureDbIsConnected();
     final db = await _getDbOrThrow();
     final fieldsString = fields.reduce((value, element) => '$value,$element');
-    final limitOffet = offset == null ? '$limit' : '$limit OFFSET $offset';
+    final limitOffet =
+        offset == null ? '${limit ?? ""}' : '$limit OFFSET $offset';
     final splitQueries = query.split(' ');
     final whereOrMapList =
         splitQueries.map((query) => fields.toMapForSqlSearch(query));

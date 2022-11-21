@@ -102,7 +102,7 @@ class Contract {
     }
 
     if (meter2No != null) {
-      meter = Meter(
+      meter2 = Meter(
         meterNo: meter2No!,
         meterSize: meter2Size,
         meterType: meterType,
@@ -211,6 +211,8 @@ class Contract {
               : null,
         );
 
+  bool get isMetered => consumptionType == ConsumptionType.metered;
+
   Map<String, dynamic> toMap() => {
         'id': id,
         'contractNo': contractNo,
@@ -231,8 +233,6 @@ class Contract {
         'folio': folio,
         'volume': volume,
         'rate': rate,
-        'meter': meter,
-        'meter2': meter2,
         'meterNo': meterNo,
         'meter2No': meter2No,
         'meterSize': meterSize,

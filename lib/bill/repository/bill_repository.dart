@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:rxdart/transformers.dart';
 import 'package:waterserver/area/area.dart';
 import 'package:waterserver/bill/bill.dart';
 import 'package:waterserver/cache/cache.dart';
@@ -65,8 +66,10 @@ class BillRepository {
     DateTime? billDate,
     bool master = false,
   }) async {
-    final billDateString = billDate.toString().split(' ').first;
-    final billDateWhere = {'billdate': billDateString};
+    final billDateWhere = {
+      Bill.getFPEquivalent('billingPeriod')!: billDate!.month,
+      Bill.getFPEquivalent('billingYear')!: billDate.year,
+    };
     var whereFinal = where;
 
     if (whereFinal != null) {
@@ -103,6 +106,84 @@ class BillRepository {
     }
   }
 
+  Future<int> countBillsByAreas(
+    List<String> areas,
+    AreaType areaType,
+    DateTime date,
+  ) async {
+    final where = getAreaWhereString(areas, areaType, date);
+
+    final count =
+        await _mysqlDatabaseRepository.rawCount(table: table, where: where);
+    return count;
+  }
+
+  Future<List<Bill>> getBillsByAreas({
+    required List<String> areas,
+    required AreaType areaType,
+    required DateTime date,
+    List<String>? field,
+    int? limit,
+    int? offset,
+    String? orderBy,
+  }) async {
+    final where = getAreaWhereString(areas, areaType, date);
+
+    final billMaps = await _mysqlDatabaseRepository.rawGet(
+      table: table,
+      where: where,
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy,
+    );
+
+    return billMaps.map((billMap) => Bill.fromFPMap(billMap)).toList();
+  }
+
+  String getAreaWhereString(
+    List<String> areas,
+    AreaType areaType,
+    DateTime date,
+  ) {
+    final List<Map<AreaType, String>> areaMapsList = areas.map((area) {
+      var index = 0;
+      final Map<AreaType, String> map = Map.fromEntries(
+        area.split('-').map((e) {
+          final entry = MapEntry(AreaType.values[index], e);
+          index++;
+          return entry;
+        }),
+      );
+      return map;
+    }).toList();
+
+    final whereAreaString =
+        areaMapsList.fold<String>('', (prevAreaString, areaMap) {
+      final areaEntries = areaMap.entries;
+      String areaString = '(';
+      int i = 0;
+      for (var area in areaEntries) {
+        if ((areaEntries.length - 1) == i) {
+          areaString +=
+              '${Bill.getFPEquivalent(area.key.name)!} = "${area.value}")';
+        } else {
+          areaString +=
+              '${Bill.getFPEquivalent(area.key.name)!} = "${area.value}" and ';
+        }
+        i++;
+      }
+
+      prevAreaString =
+          prevAreaString.isEmpty ? prevAreaString : '$prevAreaString or';
+      return '$prevAreaString $areaString';
+    });
+
+    final where =
+        '($whereAreaString) and ${Bill.getFPEquivalent('billingPeriod')!} = "${date.month}" and ${Bill.getFPEquivalent('billingYear')!} = ${date.year}';
+
+    return where;
+  }
+
   Future<String> getTable([DateTime? billDate, bool master = false]) async {
     if (master) {
       return 'bill_master';
@@ -119,7 +200,10 @@ class BillRepository {
     DateTime? billDate,
   }) async {
     final billDateString = billDate.toString().split(' ').first;
-    final billDateWhere = {'billdate': billDateString};
+    final billDateWhere = {
+      Bill.getFPEquivalent('billingPeriod')!: billDate!.month,
+      Bill.getFPEquivalent('billingYear')!: billDate.year,
+    };
     var whereFinal = where;
 
     if (whereFinal != null) {
@@ -150,8 +234,10 @@ class BillRepository {
     String? orderBy,
     DateTime? billDate,
   }) async {
-    final billDateString = billDate.toString().split(' ').first;
-    final billDateWhere = {'billdate': billDateString};
+    final billDateWhere = {
+      Bill.getFPEquivalent('billingPeriod')!: billDate!.month,
+      Bill.getFPEquivalent('billingYear')!: billDate.year,
+    };
 
     if (where != null) {
       billDate != null ? where.addAll(billDateWhere) : null;
@@ -184,8 +270,10 @@ class BillRepository {
     Map<String, dynamic>? where,
     DateTime? billDate,
   }) async {
-    final billDateString = billDate?.toDateString();
-    final billDateWhere = {'billdate': billDateString};
+    final billDateWhere = {
+      Bill.getFPEquivalent('billingPeriod')!: billDate!.month,
+      Bill.getFPEquivalent('billingYear')!: billDate.year,
+    };
 
     if (where != null) {
       billDate != null ? where.addAll(billDateWhere) : null;

@@ -289,30 +289,9 @@ class ContractView extends StatelessWidget {
                               ),
                               CustomRow(
                                 children: [
-                                  FutureBuilder<List<District>>(
-                                    future: context
-                                        .read<AreaRepository>()
-                                        .getDistricts(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData &&
-                                          selectedContract.district
-                                              .toString()
-                                              .isNotEmpty) {
-                                        final district = snapshot.data!
-                                            .firstWhere((el) =>
-                                                el.code ==
-                                                selectedContract.district!
-                                                    .trim());
-                                        return Info(
-                                          label: 'District',
-                                          value: district.toString(),
-                                        );
-                                      }
-                                      return Info(
-                                        label: 'District',
-                                        value: selectedContract.district!,
-                                      );
-                                    },
+                                  Info(
+                                    label: 'District',
+                                    value: selectedContract.district!,
                                   ),
                                   Info(
                                     label: 'Zone',

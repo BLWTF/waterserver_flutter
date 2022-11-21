@@ -2,8 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:waterserver/bill/repository/bill_repository.dart';
 import 'package:waterserver/contract/contract.dart';
-import 'package:waterserver/database/database.dart';
 import 'package:waterserver/home/home.dart';
+import 'package:waterserver/meter_reading/meter_reading.dart';
 import 'package:waterserver/tariff/model/tariff.dart';
 import 'package:waterserver/utilities/forms.dart';
 
@@ -12,12 +12,15 @@ part 'contract_state.dart';
 class ContractCubit extends Cubit<ContractState> {
   final ContractRepository _contractRepository;
   final BillRepository _billRepository;
+  final MeterReadingRepository _meterReadingRepository;
 
   ContractCubit({
     required ContractRepository contractRepository,
     required BillRepository billRepository,
+    required MeterReadingRepository meterReadingRepository,
   })  : _contractRepository = contractRepository,
         _billRepository = billRepository,
+        _meterReadingRepository = meterReadingRepository,
         super(const ContractState(page: ContractManagementPage.main));
 
   void pageChanged(ContractManagementPage page) {
@@ -214,13 +217,23 @@ class ContractCubit extends Cubit<ContractState> {
 
   void contractCreated(ContractFormState formState) async {
     _loadStatus('Creating contract...');
+    await Future.delayed(const Duration(seconds: 1));
     final Contract contract = formState.toModel();
     final newContract = await _contractRepository.createContract(contract);
     _clearStatus();
+
     _loadStatus('Creating bill...');
     await Future.delayed(const Duration(seconds: 1));
     await _billRepository.createBill(newContract);
     _clearStatus();
+
+    if (newContract.isMetered) {
+      _loadStatus('Creating meter reading...');
+      await Future.delayed(const Duration(seconds: 1));
+      await _meterReadingRepository.createReading(newContract);
+      _clearStatus();
+    }
+
     emit(state.copyWith(formState: const ContractFormState()));
     viewContract(newContract);
   }

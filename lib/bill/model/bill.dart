@@ -179,7 +179,7 @@ class Bill {
           volume: map[getFPEquivalent('volume')],
           agreedVolume: map[getFPEquivalent('agreedVolume')],
           rate: map[getFPEquivalent('rate')] != null
-              ? double.parse(map[getFPEquivalent('rate')]).toInt()
+              ? double.tryParse(map[getFPEquivalent('rate')] ?? '')?.toInt()
               : null,
           category: map['category'] != null
               ? Tariff.getFPCategory(map['category'])
@@ -196,16 +196,18 @@ class Bill {
               ? Tariff.getFPConsumptionType(
                   map[getFPEquivalent('consumption_type')])
               : null,
-          openingBalance: double.parse(map[getFPEquivalent('openingBalance')]),
-          closingBalance: double.parse(map[getFPEquivalent('closingBalance')]),
+          openingBalance:
+              double.tryParse(map[getFPEquivalent('openingBalance')] ?? ''),
+          closingBalance:
+              double.tryParse(map[getFPEquivalent('closingBalance')] ?? ''),
           billingPeriod: map[getFPEquivalent('billingPeriod')].toString(),
           billingYear: map[getFPEquivalent('billingYear')].toString(),
           currentConsumption: map[getFPEquivalent('currentConsumption')],
           currentCharges: map[getFPEquivalent('currentCharges')] != null
-              ? double.parse(map[getFPEquivalent('currentCharges')]).toInt()
+              ? double.tryParse(map[getFPEquivalent('currentCharges')])?.toInt()
               : null,
           totalCharges: map[getFPEquivalent('totalCharges')] != null
-              ? double.parse(map[getFPEquivalent('totalCharges')]).toInt()
+              ? double.tryParse(map[getFPEquivalent('totalCharges')])?.toInt()
               : null,
           contractId: map[getFPEquivalent('contractId')].toString(),
         );
@@ -244,8 +246,8 @@ class Bill {
           subzone: contract.subzone,
           round: contract.round,
           folio: contract.folio,
-          openingBalance: openingBalance,
-          closingBalance: closingBalance,
+          openingBalance: openingBalance ?? 0,
+          closingBalance: closingBalance ?? 0,
           billingPeriod: billingPeriod,
           billingYear: billingYear,
           currentConsumption: currentConsumption,

@@ -104,11 +104,11 @@ class BillView extends StatelessWidget {
                         cursor: SystemMouseCursors.click,
                         child: GestureDetector(
                           onTap: () {
-                            // Navigator.push(context,
-                            //     FluentPageRoute(builder: (context) {
-                            //   return SingleBillPrintPreview(bill: selectedBill);
-                            // }));
-                            showPrintDialog(context, selectedBill);
+                            showPrintDialog(
+                              context,
+                              [selectedBill],
+                              '${selectedBill.contractNo}_${selectedBill.monthStart!.toDateString()}',
+                            );
                           },
                           child: RichText(
                             text: TextSpan(
@@ -312,11 +312,12 @@ class BillView extends StatelessWidget {
   }
 }
 
-void showPrintDialog(BuildContext context, Bill bill) {
-  showDialog(
+Future<bool?> showPrintDialog(
+    BuildContext context, List<Bill> bills, String name) async {
+  return showDialog<bool>(
     context: context,
     builder: (context) {
-      return SingleBillPrintPreview(bill: bill);
+      return BillPrintPreview(bills: bills, name: name);
     },
   );
 }

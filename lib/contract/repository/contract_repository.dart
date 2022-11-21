@@ -40,8 +40,9 @@ class ContractRepository {
       'dpc':
           '${contract.district!}-${contract.zone!}-${contract.subzone!}-${contract.round!}-${contract.folio!}',
     });
-    await _mysqlDatabaseRepository.create(table: table, fields: contractMap);
-    final newContract = await getContract(contractNo: newContractNo);
+    final newContactId = await _mysqlDatabaseRepository.create(
+        table: table, fields: contractMap);
+    final newContract = await getContract(id: newContactId.toString());
     return newContract!;
   }
 
@@ -90,7 +91,7 @@ class ContractRepository {
       },
       limit: 1,
     );
-    final newFolio = int.parse(lastFolio.first['_max']).abs() + 100;
+    final newFolio = int.parse(lastFolio.first['_max'] ?? '0').abs() + 100;
     return newFolio;
   }
 

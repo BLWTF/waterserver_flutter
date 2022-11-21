@@ -21,6 +21,25 @@ class MeterReadingState extends Equatable {
     this.message,
   });
 
+  MeterReadingState copyWith({
+    MeterReadingManagementPage? page,
+    List<String>? columns,
+    String? tableSearchQuery,
+    MeterReadingFormState? formState,
+    MeterReading? selectedReading,
+    HomeStatus? status,
+    String? message,
+  }) =>
+      MeterReadingState(
+        page: page ?? this.page,
+        columns: columns ?? this.columns,
+        tableSearchQuery: tableSearchQuery ?? this.tableSearchQuery,
+        formState: formState ?? this.formState,
+        selectedReading: selectedReading ?? this.selectedReading,
+        status: status ?? this.status,
+        message: message ?? this.message,
+      );
+
   @override
   List<Object?> get props => [
         page,

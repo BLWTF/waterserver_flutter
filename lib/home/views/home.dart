@@ -33,6 +33,7 @@ class Home extends StatelessWidget {
           create: (context) => ContractCubit(
             contractRepository: context.read<ContractRepository>(),
             billRepository: context.read<BillRepository>(),
+            meterReadingRepository: context.read<MeterReadingRepository>(),
           ),
         ),
         BlocProvider(

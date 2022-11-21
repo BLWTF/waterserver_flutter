@@ -60,6 +60,51 @@ class BillCubit extends Cubit<BillState> {
     }
   }
 
+  Future<void> printSessionInfo() async {
+    final selectedAreas =
+        state.selectedPrintByAreas.map((e) => e.code).toList();
+    final printBy = state.billPrintBy!;
+    final date = state.printBillDate ?? state.billDate;
+    final billsCount =
+        await _billRepository.countBillsByAreas(selectedAreas, printBy, date!);
+    final printSession = PrintSession(billsCount: billsCount);
+    emit(state.copyWith(printSession: printSession));
+  }
+
+  Future<void> proceedPrintSession([bool increased = false]) async {
+    late final PrintSession printSession;
+    final selectedAreas =
+        state.selectedPrintByAreas.map((e) => e.code).toList();
+    final printBy = state.billPrintBy!;
+    final date = state.printBillDate ?? state.billDate;
+
+    if (!increased) {
+      printSession = state.printSession!;
+    } else {
+      printSession = state.printSession!.copyWith(
+          sessionsCompleted: (state.printSession!.sessionsCompleted + 1));
+    }
+
+    final bills = await _billRepository.getBillsByAreas(
+      areas: selectedAreas,
+      areaType: printBy,
+      date: date!,
+      limit: printSession.printingNumber,
+      offset: printSession.printingNumber * printSession.sessionsCompleted,
+      orderBy: Bill.getFPEquivalent('id'),
+    );
+
+    emit(state.copyWith(
+      printSession: printSession.copyWith(
+        currentPrintBills: bills,
+      ),
+    ));
+  }
+
+  void cancelPrintSession() {
+    emit(state.copyWithNullPrintSession());
+  }
+
   void viewBillFromContractNo(String contractNo, [DateTime? billDate]) async {
     _loadStatus('Searching for bill');
     final bill = await _billRepository.getBill(
@@ -81,29 +126,29 @@ class BillCubit extends Cubit<BillState> {
     emit(state.copyWith(printBillDate: date));
   }
 
-  Future<void> updateBillPrintBy(String? printBy, DateTime billDate) async {
+  Future<void> updateBillPrintBy(AreaType? printBy, DateTime billDate) async {
     emit(state.copyWithNullBillPrintBy(printBy));
 
     if (printBy == null) return;
 
     late final List<Area> areas;
     switch (printBy) {
-      case 'district':
+      case AreaType.district:
         areas = (await _billRepository.getBillPeriodDistricts(billDate))
             .map((e) => e.toArea())
             .toList();
         break;
-      case 'zone':
+      case AreaType.zone:
         areas = (await _billRepository.getBillPeriodZones(billDate))
             .map((e) => e.toArea())
             .toList();
         break;
-      case 'subzone':
+      case AreaType.subzone:
         areas = (await _billRepository.getBillPeriodSubzones(billDate))
             .map((e) => e.toArea())
             .toList();
         break;
-      case 'rounds':
+      case AreaType.round:
         areas = (await _billRepository.getBillPeriodRounds(billDate))
             .map((e) => e.toArea())
             .toList();
@@ -123,10 +168,6 @@ class BillCubit extends Cubit<BillState> {
     selectedPrintByAreas.remove(area);
 
     emit(state.copyWith(selectedPrintByAreas: selectedPrintByAreas));
-  }
-
-  bool isAllAreasSelected() {
-    return state.printByAreas?.length == state.selectedPrintByAreas.length;
   }
 
   void selectAllAreas() {

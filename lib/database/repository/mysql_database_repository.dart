@@ -77,6 +77,36 @@ class MysqlDatabaseRepository {
     return rows;
   }
 
+  Future<List<dynamic>> rawGet({
+    required String table,
+    required String where,
+    List<String>? fields,
+    int? limit,
+    int? offset,
+    String? orderBy,
+  }) {
+    final rows = _databaseProvider.rawGet(
+      table: table,
+      where: where,
+      fields: fields,
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy,
+    );
+    return rows;
+  }
+
+  Future<int> rawCount({
+    required String table,
+    required String where,
+  }) {
+    final rows = _databaseProvider.rawCount(
+      table: table,
+      where: where,
+    );
+    return rows;
+  }
+
   Future<List<dynamic>> search({
     required String table,
     required String query,

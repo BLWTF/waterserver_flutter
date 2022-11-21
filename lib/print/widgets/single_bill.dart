@@ -43,7 +43,9 @@ class SingleBill extends StatelessWidget {
                 Positioned(
                   top: 75,
                   right: 40,
-                  child: Text(bill.currentCharges!.format()),
+                  child: Text(bill.currentCharges == null
+                      ? ''
+                      : bill.currentCharges!.format()),
                 ),
                 // period from
                 Positioned(
@@ -83,7 +85,7 @@ class SingleBill extends StatelessWidget {
                 Positioned(
                   top: 228,
                   left: 100,
-                  child: Text(bill.meterNo!),
+                  child: Text(bill.meterNo ?? ''),
                 ),
                 // old a/c no
                 Positioned(
