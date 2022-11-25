@@ -124,9 +124,20 @@ class ContractCubit extends Cubit<ContractState> {
   void districtUpdated(String value) {
     final district = ComboField.dirty(value);
     final newFormState = state.formState == null
-        ? ContractFormState(district: district, zone: const ComboField.pure())
-        : state.formState!
-            .copyWith(district: district, zone: const ComboField.pure());
+        ? ContractFormState(
+            district: district,
+            zone: const ComboField.pure(),
+            subzone: const ComboField.pure(),
+            round: const ComboField.pure(),
+            folio: const Name.pure(),
+          )
+        : state.formState!.copyWith(
+            district: district,
+            zone: const ComboField.pure(),
+            subzone: const ComboField.pure(),
+            round: const ComboField.pure(),
+            folio: const Name.pure(),
+          );
 
     emit(state.copyWith(formState: newFormState));
   }

@@ -73,7 +73,7 @@ class ContractRepository {
     }
   }
 
-  Future<int> getNewFolio({
+  Future<String> getNewFolio({
     required String round,
   }) async {
     final district = round.getAreaCode(AreaType.district);
@@ -92,7 +92,7 @@ class ContractRepository {
       limit: 1,
     );
     final newFolio = int.parse(lastFolio.first['_max'] ?? '0').abs() + 100;
-    return newFolio;
+    return newFolio.toString().padLeft(4, '0');
   }
 
   Future<Contract?> getContract({String? id, String? contractNo}) async {
