@@ -61,6 +61,24 @@ class PaymentCubit extends Cubit<PaymentState> {
     emit(state.copyWith(formState: newFormState));
   }
 
+  void rbcNoUpdated(String value) {
+    final rbcNo = RequiredName.dirty(value);
+    final newFormState = state.formState == null
+        ? PaymentFormState(rcbNo: rbcNo)
+        : state.formState!.copyWith(rcbNo: rbcNo);
+
+    emit(state.copyWith(formState: newFormState));
+  }
+
+  void cashpointUpdated(String value) {
+    final cashpoint = RequiredName.dirty(value);
+    final newFormState = state.formState == null
+        ? PaymentFormState(cashpoint: cashpoint)
+        : state.formState!.copyWith(cashpoint: cashpoint);
+
+    emit(state.copyWith(formState: newFormState));
+  }
+
   void dateUpdated(DateTime value) {
     final date = Datetime.dirty(value);
 

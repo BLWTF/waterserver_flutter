@@ -137,4 +137,14 @@ class PaymentRepository {
         table: table, query: query, fields: fields);
     return count;
   }
+
+  Future<List<String>> getCashpoints() async {
+    final rows = await _mysqlDatabaseRepository.get(
+      table: 'cashpoint',
+      fields: ['cashpoint'],
+    );
+
+    final list = rows.map((row) => row['cashpoint'].toString().trim()).toList();
+    return list;
+  }
 }

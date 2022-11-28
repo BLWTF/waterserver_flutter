@@ -12,8 +12,8 @@ class PaymentFormState extends Equatable with FormzMixin {
   final RequiredName contractNo;
   final RequiredName fullName;
   final RequiredName contractId;
-  final Name rcbNo;
-  final Name cashpoint;
+  final RequiredName rcbNo;
+  final RequiredName cashpoint;
   final Name tariff;
   final Name district;
   final Name zone;
@@ -28,8 +28,8 @@ class PaymentFormState extends Equatable with FormzMixin {
     this.contractNo = const RequiredName.pure(),
     this.fullName = const RequiredName.pure(),
     this.contractId = const RequiredName.pure(),
-    this.rcbNo = const Name.pure(),
-    this.cashpoint = const Name.pure(),
+    this.rcbNo = const RequiredName.pure(),
+    this.cashpoint = const RequiredName.pure(),
     this.tariff = const Name.pure(),
     this.district = const Name.pure(),
     this.zone = const Name.pure(),
@@ -46,8 +46,8 @@ class PaymentFormState extends Equatable with FormzMixin {
           contractNo: RequiredName.dirty(payment.contractNo!),
           fullName: RequiredName.dirty(payment.fullName!),
           contractId: RequiredName.dirty(payment.contractId!),
-          rcbNo: Name.dirty(payment.rcbNo),
-          cashpoint: Name.dirty(payment.cashpoint),
+          rcbNo: RequiredName.dirty(payment.rcbNo!),
+          cashpoint: RequiredName.dirty(payment.cashpoint!),
           tariff: Name.dirty(payment.tariff),
           district: Name.dirty(payment.district),
           zone: Name.dirty(payment.zone),
@@ -81,8 +81,8 @@ class PaymentFormState extends Equatable with FormzMixin {
     RequiredName? contractNo,
     RequiredName? fullName,
     RequiredName? contractId,
-    Name? rcbNo,
-    Name? cashpoint,
+    RequiredName? rcbNo,
+    RequiredName? cashpoint,
     Name? tariff,
     Name? district,
     Name? zone,

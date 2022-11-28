@@ -166,6 +166,34 @@ class PaymentManagementForm extends StatelessWidget {
                       ],
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: CustomTextFormBox(
+                            name: 'RBC no.',
+                            state: formState?.rcbNo,
+                            onUpdate: (value) => context
+                                .read<PaymentCubit>()
+                                .rbcNoUpdated(value),
+                          ),
+                        ),
+                        Expanded(
+                          child: FutureSuggestBox(
+                            future: context
+                                .read<PaymentRepository>()
+                                .getCashpoints(),
+                            value: formState?.cashpoint.value,
+                            label: 'Cashpoint',
+                            onUpdate: (text) => context
+                                .read<PaymentCubit>()
+                                .cashpointUpdated(text),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

@@ -1,8 +1,9 @@
 {
     "name": "WaterServer",
-    "version": 0.6,
+    "version": 0.62,
     "description": [
-        "Added Multiple Bill Printing"
+        "Fixed contract folio to 4 digits length",
+        "Added RCB No and cashpoint to payment form"
     ],
     "windows_file_name": "installers/windows/Waterserver.exe"
 }

@@ -155,6 +155,15 @@ class PaymentView extends StatelessWidget {
                                         ),
                                       ],
                                     ),
+                                    CustomRow(
+                                      children: [
+                                        Info(
+                                          label: 'Cashpoint',
+                                          value:
+                                              selectedPayment.cashpoint ?? '-',
+                                        ),
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ),
