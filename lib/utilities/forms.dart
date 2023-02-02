@@ -106,3 +106,49 @@ class Datetime extends FormzInput<DateTime?, DatetimeValidationError> {
     return value != null ? null : DatetimeValidationError.empty;
   }
 }
+
+enum UsernameValidationError { empty, invalid, taken }
+
+class Username extends FormzInput<String, UsernameValidationError> {
+  final bool taken;
+
+  const Username.pure([String value = '', this.taken = false])
+      : super.pure(value);
+  const Username.dirty([String value = '', this.taken = false])
+      : super.dirty(value);
+
+  @override
+  UsernameValidationError? validator(String? value) {
+    if (value != null && value.isEmpty) {
+      return UsernameValidationError.empty;
+    }
+
+    if (taken) {
+      return UsernameValidationError.taken;
+    }
+
+    return null;
+  }
+}
+
+enum PasswordValidationError { empty, invalid, limitExceeded }
+
+class Password extends FormzInput<String, PasswordValidationError> {
+  final limit = 6;
+
+  const Password.pure([String value = '']) : super.pure(value);
+  const Password.dirty([String value = '']) : super.dirty(value);
+
+  @override
+  PasswordValidationError? validator(String? value) {
+    if (value != null && value.isEmpty) {
+      return PasswordValidationError.empty;
+    }
+
+    if (value != null && value.length < limit) {
+      return PasswordValidationError.limitExceeded;
+    }
+
+    return null;
+  }
+}

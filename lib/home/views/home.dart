@@ -1,5 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/link.dart';
+import 'package:waterserver/authentication/authentication.dart';
 import 'package:waterserver/bill/bill.dart';
 import 'package:waterserver/home/home.dart';
 import 'package:waterserver/contract/contract.dart';
@@ -9,6 +11,7 @@ import 'package:waterserver/meter_reading/views/meter_reading.dart';
 import 'package:waterserver/payment/payment.dart';
 import 'package:waterserver/settings/settings.dart';
 import 'package:waterserver/utilities/dialog/dialog.dart';
+import 'package:waterserver/utilities/dialog/logout_dialog.dart';
 import 'package:waterserver/widgets/window_buttons.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -201,11 +204,57 @@ class _HomeViewState extends State<HomeView> with WindowListener {
                 icon: const Icon(FluentIcons.settings),
                 body: const Settings(),
                 title: const Text('Settings'),
-              )
+              ),
+              LogOutPane(
+                icon: const Icon(FluentIcons.sign_out),
+                body: const SizedBox.shrink(),
+                title: const Text('Log Out'),
+                action: () async {
+                  final logout = await showLogoutDialog(context);
+                  if (logout) {
+                    context.read<AuthenticationRepository>().logOut();
+                  }
+                },
+              ),
             ],
           ),
         );
       }),
+    );
+  }
+}
+
+class LogOutPane extends PaneItem {
+  final Function() action;
+
+  LogOutPane({
+    required super.icon,
+    required super.body,
+    required this.action,
+    super.title,
+  });
+
+  @override
+  Widget build(
+    BuildContext context,
+    bool selected,
+    VoidCallback? onPressed, {
+    PaneDisplayMode? displayMode,
+    bool showTextOnTop = true,
+    bool? autofocus = false,
+    int? itemIndex,
+  }) {
+    return Link(
+      uri: Uri.parse('/home'),
+      builder: (context, followLink) => super.build(
+        context,
+        selected,
+        action,
+        displayMode: displayMode,
+        showTextOnTop: showTextOnTop,
+        itemIndex: itemIndex,
+        autofocus: autofocus,
+      ),
     );
   }
 }

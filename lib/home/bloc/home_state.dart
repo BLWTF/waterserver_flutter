@@ -9,6 +9,7 @@ enum HomePage {
   payment,
   meterReading,
   settings,
+  logOut,
 }
 
 class HomeState extends Equatable {

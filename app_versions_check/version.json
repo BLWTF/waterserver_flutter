@@ -1,9 +1,8 @@
 {
     "name": "WaterServer",
-    "version": 0.62,
+    "version": 0.65,
     "description": [
-        "Fixed contract folio to 4 digits length",
-        "Added RCB No and cashpoint to payment form"
+        "Added authentication"
     ],
     "windows_file_name": "installers/windows/Waterserver.exe"
 }

@@ -1,73 +1,90 @@
 part of 'settings.dart';
 
-class SettingsMysql extends StatefulWidget {
+class SettingsMysql extends StatelessWidget {
   final MysqlSettings mysqlSettings;
-
-  const SettingsMysql({Key? key, required this.mysqlSettings})
-      : super(key: key);
+  const SettingsMysql({
+    Key? key,
+    required this.mysqlSettings,
+  }) : super(key: key);
 
   @override
-  State<SettingsMysql> createState() => _SettingsMysqlState();
+  Widget build(BuildContext context) {
+    return SettingsMysqlForm(mysqlSettings: mysqlSettings);
+  }
 }
 
-class _SettingsMysqlState extends State<SettingsMysql> {
-  late final TextEditingController _hostController;
-  late final TextEditingController _portController;
-  late final TextEditingController _userController;
-  late final TextEditingController _passwordController;
-  late final TextEditingController _databaseController;
-  late final ScrollController _scrollController;
+class SettingsMysqlForm extends StatefulWidget {
+  final MysqlSettings mysqlSettings;
+  final bool standAlone;
+
+  const SettingsMysqlForm({
+    super.key,
+    required this.mysqlSettings,
+    this.standAlone = false,
+  });
+
+  @override
+  State<SettingsMysqlForm> createState() => _SettingsMysqlFormState();
+}
+
+class _SettingsMysqlFormState extends State<SettingsMysqlForm> {
+  late final TextEditingController hostController;
+  late final TextEditingController portController;
+  late final TextEditingController userController;
+  late final TextEditingController passwordController;
+  late final TextEditingController databaseController;
+  late final ScrollController scrollController;
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
-    _hostController = TextEditingController(text: widget.mysqlSettings.host)
+    scrollController = ScrollController();
+    hostController = TextEditingController(text: widget.mysqlSettings.host)
       ..addListener(_onUpdateHost);
-    _portController = TextEditingController(
+    portController = TextEditingController(
         text: widget.mysqlSettings.port == null
             ? ''
             : widget.mysqlSettings.port.toString())
       ..addListener(_onUpdatePort);
-    _userController = TextEditingController(text: widget.mysqlSettings.user)
+    userController = TextEditingController(text: widget.mysqlSettings.user)
       ..addListener(_onUpdateUser);
-    _passwordController =
+    passwordController =
         TextEditingController(text: widget.mysqlSettings.password)
           ..addListener(_onUpdatePassword);
-    _databaseController =
+    databaseController =
         TextEditingController(text: widget.mysqlSettings.database)
           ..addListener(_onUpdateDatabase);
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
-    _hostController.dispose();
-    _portController.dispose();
-    _userController.dispose();
-    _passwordController.dispose();
-    _databaseController.dispose();
+    scrollController.dispose();
+    hostController.dispose();
+    portController.dispose();
+    userController.dispose();
+    passwordController.dispose();
+    databaseController.dispose();
     super.dispose();
   }
 
   void _onUpdateHost() {
-    context.read<SettingsCubit>().hostUpdated(_hostController.text);
+    context.read<SettingsCubit>().hostUpdated(hostController.text);
   }
 
   void _onUpdatePort() {
-    context.read<SettingsCubit>().portUpdated(_portController.text);
+    context.read<SettingsCubit>().portUpdated(portController.text);
   }
 
   void _onUpdateUser() {
-    context.read<SettingsCubit>().userUpdated(_userController.text);
+    context.read<SettingsCubit>().userUpdated(userController.text);
   }
 
   void _onUpdatePassword() {
-    context.read<SettingsCubit>().passwordUpdated(_passwordController.text);
+    context.read<SettingsCubit>().passwordUpdated(passwordController.text);
   }
 
   void _onUpdateDatabase() {
-    context.read<SettingsCubit>().databaseUpdated(_databaseController.text);
+    context.read<SettingsCubit>().databaseUpdated(databaseController.text);
   }
 
   void _onSubmit() {
@@ -90,12 +107,14 @@ class _SettingsMysqlState extends State<SettingsMysql> {
           child: Icon(FluentIcons.database_activity, size: 30),
         ),
         title: const Text('MySQL Database Settings'),
-        commandBar: Button(
-          child: const Icon(FluentIcons.back),
-          onPressed: () {
-            context.read<SettingsCubit>().pageChanged(SettingsPage.main);
-          },
-        ),
+        commandBar: widget.standAlone
+            ? null
+            : Button(
+                child: const Icon(FluentIcons.back),
+                onPressed: () {
+                  context.read<SettingsCubit>().pageChanged(SettingsPage.main);
+                },
+              ),
       ),
       children: [
         Column(
@@ -113,7 +132,7 @@ class _SettingsMysqlState extends State<SettingsMysql> {
                         .caption
                         ?.apply(fontSizeFactor: 1.0),
                     placeholder: 'Host',
-                    controller: _hostController,
+                    controller: hostController,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (text) =>
                         formState!.host.invalid ? 'Provide valid host' : null,
@@ -126,7 +145,7 @@ class _SettingsMysqlState extends State<SettingsMysql> {
                         .caption
                         ?.apply(fontSizeFactor: 1.0),
                     placeholder: 'User',
-                    controller: _userController,
+                    controller: userController,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (text) =>
                         formState!.user.invalid ? 'Provide valid user' : null,
@@ -139,7 +158,7 @@ class _SettingsMysqlState extends State<SettingsMysql> {
                         .caption
                         ?.apply(fontSizeFactor: 1.0),
                     placeholder: 'Port',
-                    controller: _portController,
+                    controller: portController,
                     keyboardType: TextInputType.number,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (text) =>
@@ -153,7 +172,7 @@ class _SettingsMysqlState extends State<SettingsMysql> {
                         .caption
                         ?.apply(fontSizeFactor: 1.0),
                     placeholder: 'Password',
-                    controller: _passwordController,
+                    controller: passwordController,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (text) => formState!.password.invalid
                         ? 'Provide valid password'
@@ -169,7 +188,7 @@ class _SettingsMysqlState extends State<SettingsMysql> {
                         .caption
                         ?.apply(fontSizeFactor: 1.0),
                     placeholder: 'Database',
-                    controller: _databaseController,
+                    controller: databaseController,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (text) => formState!.database.invalid
                         ? 'Provide valid database name'
@@ -187,13 +206,16 @@ class _SettingsMysqlState extends State<SettingsMysql> {
                             : _onSubmit,
                         child: const Text('Connect'),
                       ),
-                      Button(
-                        child: const Text('Cancel'),
-                        onPressed: () {
-                          context
-                              .read<SettingsCubit>()
-                              .pageChanged(SettingsPage.main);
-                        },
+                      Visibility(
+                        visible: !widget.standAlone,
+                        child: Button(
+                          child: const Text('Cancel'),
+                          onPressed: () {
+                            context
+                                .read<SettingsCubit>()
+                                .pageChanged(SettingsPage.main);
+                          },
+                        ),
                       ),
                     ],
                   )
