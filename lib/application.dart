@@ -1,3 +1,3 @@
 class ApplicationConfig {
-  static const double currentVersion = 0.65;
+  static const double currentVersion = 0.66;
 }

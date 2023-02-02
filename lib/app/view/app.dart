@@ -1,4 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart' hide Page;
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:waterserver/app/app.dart';
 import 'package:waterserver/authentication/bloc/authentication_bloc.dart';
@@ -215,12 +216,34 @@ class AppAuthentication extends StatelessWidget {
         builder: (context, state) {
       switch (state.status) {
         case AuthenticationStatus.unknown:
-          return Container();
+          return const SplashScreenWidget();
         case AuthenticationStatus.authenticated:
           return Home(title: title);
         case AuthenticationStatus.unauthenticated:
           return const Login();
       }
     });
+  }
+}
+
+class SplashScreenWidget extends StatelessWidget {
+  const SplashScreenWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFFFFFFF),
+      body: Center(
+        child: Container(
+          width: 200,
+          height: 200,
+          color: const Color(0xFFFFFFFF),
+          child: Image.asset(
+            'lib/assets/images/waterserver-logo-large.png',
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
   }
 }
